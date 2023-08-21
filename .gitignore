@@ -1,0 +1,6 @@
+# folders
+references
+obj
+
+# files
+*.o

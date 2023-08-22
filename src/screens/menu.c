@@ -1,8 +1,40 @@
 #include "../includes/screen.h"
+#include "../includes/package.h"
+
+#define __MENU_SIZE 3
+
+//----------------------------------------------------------------------------------
+// Global.
+//----------------------------------------------------------------------------------
+
+extern Package_t *globalPackage;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
+
+const char *_options[__MENU_SIZE] = {
+    "start",
+    "option",
+    "exit"};
+
+Vector2 _optionsPosition[__MENU_SIZE];
+
+int32_t currentOption = 0;
+
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
+    TINY_BURGER static void __load_options(void);
+    TINY_BURGER static void __update_options(void);
+    TINY_BURGER static void __draw_options(void);
+    TINY_BURGER static void __select_option(void);
+
+#if defined(__cplusplus)
+}
+#endif
 
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
@@ -17,31 +49,95 @@ TINY_BURGER Screen_t *create_menu(void)
         return NULL;
     }
 
-    screen->currentScreenType = SCREEN_TYPE_MENU;
-    screen->nextScreenType = SCREEN_TYPE_EMPTY;
+    screen->currentScreenType = TB_SCREEN_TYPE_MENU;
+    screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
 
     TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer created successfully.");
+    __load_options();
     return screen;
 }
 
 TINY_BURGER void update_menu(Screen_t *const screen)
 {
-    // TODO
+    __update_options();
 }
 TINY_BURGER void draw_menu(const Screen_t *const screen)
 {
-    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GREEN);
+    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_0));
+    __draw_options();
 }
 
 TINY_BURGER void destroy_menu(Screen_t **ptr)
 {
     if ((*ptr) != NULL)
     {
-        TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer destroyed successfully.");
         MemFree((*ptr));
         (*ptr) = NULL;
+        TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer destroyed successfully.");
     }
 }
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
+TINY_BURGER static void __load_options(void)
+{
+    int32_t middle = TINY_BURGER_WIDTH / 2;
+    Vector2 position = (Vector2){0, TINY_BURGER_HEIGHT - TINY_BURGER_FONT_SIZE * 8};
+    for (size_t i = 0; i < __MENU_SIZE; ++i)
+    {
+        Vector2 measure = MeasureTextEx(globalPackage->fonts[TB_FONT_TYPE_04B03], _options[i], TINY_BURGER_FONT_SIZE, 1.0);
+        _optionsPosition[i] =
+            (Vector2){middle - (measure.x / 2), position.y + i * TINY_BURGER_FONT_SIZE};
+    }
+}
+
+TINY_BURGER static void __update_options(void)
+{
+    if (IsKeyPressed(KEY_UP))
+    {
+        currentOption = (currentOption - 1) % __MENU_SIZE;
+        if (currentOption < 0)
+            currentOption = __MENU_SIZE + currentOption;
+    }
+    else if (IsKeyPressed(KEY_DOWN))
+    {
+        currentOption = (currentOption + 1) % __MENU_SIZE;
+    }
+    else if (IsKeyPressed(KEY_ENTER))
+    {
+        __select_option();
+    }
+}
+TINY_BURGER static void __draw_options(void)
+{
+    Color normalColor = GetColor(TINY_BURGER_COLOR_15);
+    Color selectedColor = GetColor(TINY_BURGER_COLOR_13);
+    for (size_t i = 0; i < __MENU_SIZE; ++i)
+    {
+        DrawTextEx(
+            globalPackage->fonts[TB_FONT_TYPE_04B03],
+            _options[i],
+            _optionsPosition[i],
+            TINY_BURGER_FONT_SIZE,
+            1.0,
+            currentOption == i ? selectedColor : normalColor);
+    }
+}
+
+TINY_BURGER static void __select_option(void)
+{
+    switch (currentOption)
+    {
+    case 0:
+        TraceLog(LOG_INFO, ">>> MENU");
+        break;
+    case 1:
+        TraceLog(LOG_INFO, ">>> OPTION");
+        break;
+    case 2:
+        TraceLog(LOG_INFO, ">>> EXIT");
+        break;
+    default:
+        break;
+    }
+}

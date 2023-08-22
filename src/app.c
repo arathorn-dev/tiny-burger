@@ -1,21 +1,45 @@
 #include "includes/app.h"
+#include "includes/package.h"
+
+//----------------------------------------------------------------------------------
+// Global Definition.
+//----------------------------------------------------------------------------------
+Package_t *globalPackage = NULL;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
 
-TINY_BURGER static void __init_window(void);
-TINY_BURGER static void __close_window(void);
-TINY_BURGER static void __destroy_app(App_t **);
-TINY_BURGER static void __update_window(App_t *);
-TINY_BURGER static void __draw_window(App_t *);
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
 
-TINY_BURGER static void __update_screen(Screen_t *const);
-TINY_BURGER static void __draw_screen(const Screen_t *const);
-TINY_BURGER static void __change_screen(App_t *);
-TINY_BURGER static void __change_screen_to(App_t *, ScreenType_u);
-TINY_BURGER static Screen_t *__load_screen(ScreenType_u);
-TINY_BURGER static void __unload_screen(Screen_t *);
+    TINY_BURGER static void __init_window(void);
+    TINY_BURGER static void __close_window(void);
+    TINY_BURGER static void __destroy_app(App_t **);
+    TINY_BURGER static void __destroy_app_pointer(App_t *);
+    TINY_BURGER static void __update_window(App_t *);
+    TINY_BURGER static void __draw_window(App_t *);
+
+    TINY_BURGER static void __update_screen(Screen_t *const);
+    TINY_BURGER static void __draw_screen(const Screen_t *const);
+    TINY_BURGER static void __change_screen_to(App_t *, ScreenType_u);
+    TINY_BURGER static Screen_t *__load_screen(ScreenType_u);
+    TINY_BURGER static void __unload_screen(Screen_t *);
+
+    TINY_BURGER static void __transition_screen(Screen_t *, ScreenType_u);
+    TINY_BURGER static void __update_transition(App_t *);
+    TINY_BURGER static void __draw_transition(void);
+
+#if defined(__cplusplus)
+}
+#endif
+
+TINY_BURGER static float _transAlpha = 0.0f;
+TINY_BURGER static bool _onTransition = false;
+TINY_BURGER static bool _transFadeOut = false;
+TINY_BURGER static ScreenType_u _nextScreen = TB_SCREEN_TYPE_EMPTY;
 
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
@@ -28,14 +52,26 @@ TINY_BURGER App_t *create_app(void)
         TraceLog(LOG_DEBUG, "Error to create App_t pointer.");
         return NULL;
     }
-    app->screen = __load_screen(SCREEN_TYPE_MENU);
-    if (app->screen == NULL)
+
+    __init_window();
+    globalPackage = create_package();
+    if (globalPackage == NULL)
     {
-        MemFree(app);
-        app = NULL;
+        __close_window();
+        __destroy_app_pointer(app);
         return NULL;
     }
-    __init_window();
+
+    app->screen = __load_screen(TB_SCREEN_TYPE_MENU);
+    if (app->screen == NULL)
+    {
+        __close_window();
+        destroy_package(&globalPackage);
+        globalPackage = NULL;
+        __destroy_app_pointer(app);
+        return NULL;
+    }
+
     TraceLog(LOG_DEBUG, "App_t pointer created successfully.");
     return app;
 }
@@ -60,7 +96,7 @@ TINY_BURGER void destroy_app(App_t **ptr)
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __init_window(void)
 {
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, TINY_BURGER_TITLE);
     SetTargetFPS(TINY_BURGER_FPS);
 
@@ -74,29 +110,39 @@ TINY_BURGER static void __close_window(void)
     CloseWindow();
 }
 
+TINY_BURGER static void __destroy_app_pointer(App_t *app)
+{
+    MemFree(app);
+    app = NULL;
+    TraceLog(LOG_DEBUG, "App_t pointer destroyed successfully.");
+}
+
 TINY_BURGER static void __destroy_app(App_t **ptr)
 {
     if ((*ptr) != NULL)
     {
         __unload_screen((*ptr)->screen);
-        TraceLog(LOG_DEBUG, "App_t pointer destroyed successfully.");
-        MemFree((*ptr));
-        (*ptr) = NULL;
+        __destroy_app_pointer((*ptr));
     }
 }
 
 TINY_BURGER static void __update_window(App_t *app)
 {
-    if (IsKeyPressed(KEY_F1))
+    if (!_onTransition)
     {
-        __change_screen_to(app, SCREEN_TYPE_MENU);
-    }
-    else if (IsKeyPressed(KEY_F2))
-    {
-        __change_screen_to(app, SCREEN_TYPE_GAME);
-    }
+        if (IsKeyPressed(KEY_F1))
+            __transition_screen(app->screen, TB_SCREEN_TYPE_MENU);
+        else if (IsKeyPressed(KEY_F2))
+            __transition_screen(app->screen, TB_SCREEN_TYPE_GAME);
+        else if (IsKeyPressed(KEY_F3))
+            __transition_screen(app->screen, TB_SCREEN_TYPE_OPTION);
 
-    __update_screen(app->screen);
+        __update_screen(app->screen);
+    }
+    else
+    {
+        __update_transition(app);
+    }
 }
 
 TINY_BURGER static void __draw_window(App_t *app)
@@ -111,12 +157,16 @@ TINY_BURGER static void __update_screen(Screen_t *const screen)
 {
     switch (screen->currentScreenType)
     {
-    case SCREEN_TYPE_MENU:
+    case TB_SCREEN_TYPE_MENU:
         update_menu(screen);
         break;
 
-    case SCREEN_TYPE_GAME:
+    case TB_SCREEN_TYPE_GAME:
         update_game(screen);
+        break;
+
+    case TB_SCREEN_TYPE_OPTION:
+        update_option(screen);
         break;
 
     default:
@@ -128,16 +178,25 @@ TINY_BURGER static void __draw_screen(const Screen_t *const screen)
 {
     switch (screen->currentScreenType)
     {
-    case SCREEN_TYPE_MENU:
+    case TB_SCREEN_TYPE_MENU:
         draw_menu(screen);
         break;
 
-    case SCREEN_TYPE_GAME:
+    case TB_SCREEN_TYPE_GAME:
         draw_game(screen);
+        break;
+
+    case TB_SCREEN_TYPE_OPTION:
+        draw_option(screen);
         break;
 
     default:
         break;
+    }
+
+    if (_onTransition)
+    {
+        __draw_transition();
     }
 }
 
@@ -146,18 +205,21 @@ TINY_BURGER static Screen_t *__load_screen(ScreenType_u type)
     Screen_t *screen = NULL;
     switch (type)
     {
-    case SCREEN_TYPE_MENU:
+    case TB_SCREEN_TYPE_MENU:
         screen = create_menu();
         break;
 
-    case SCREEN_TYPE_GAME:
+    case TB_SCREEN_TYPE_GAME:
         screen = create_game();
+        break;
+
+    case TB_SCREEN_TYPE_OPTION:
+        screen = create_option();
         break;
 
     default:
         break;
     }
-
     return screen;
 }
 TINY_BURGER static void __unload_screen(Screen_t *screen)
@@ -166,27 +228,21 @@ TINY_BURGER static void __unload_screen(Screen_t *screen)
     {
         switch (screen->currentScreenType)
         {
-        case SCREEN_TYPE_MENU:
+        case TB_SCREEN_TYPE_MENU:
             destroy_menu(&screen);
             break;
 
-        case SCREEN_TYPE_GAME:
+        case TB_SCREEN_TYPE_GAME:
             destroy_game(&screen);
+            break;
+
+        case TB_SCREEN_TYPE_OPTION:
+            destroy_option(&screen);
             break;
 
         default:
             break;
         }
-    }
-}
-
-TINY_BURGER static void __change_screen(App_t *app)
-{
-    if (app->screen != NULL)
-    {
-        ScreenType_u next = app->screen->nextScreenType;
-        __unload_screen(app->screen);
-        app->screen = __load_screen(next);
     }
 }
 
@@ -197,4 +253,45 @@ TINY_BURGER static void __change_screen_to(App_t *app, ScreenType_u next)
         __unload_screen(app->screen);
         app->screen = __load_screen(next);
     }
+}
+
+TINY_BURGER static void __transition_screen(Screen_t *screen, ScreenType_u next)
+{
+    if (screen != NULL && screen->currentScreenType != next)
+    {
+        _onTransition = true;
+        _transFadeOut = false;
+        _nextScreen = next;
+        _transAlpha = 0.0f;
+    }
+}
+TINY_BURGER static void __update_transition(App_t *app)
+{
+    if (!_transFadeOut)
+    {
+        _transAlpha += 0.09f;
+
+        if (_transAlpha > 1.01f)
+        {
+            _transAlpha = 1.0f;
+            __change_screen_to(app, _nextScreen);
+            _transFadeOut = true;
+        }
+    }
+    else
+    {
+        _transAlpha -= 0.09f;
+
+        if (_transAlpha < -0.01f)
+        {
+            _transAlpha = 0.0f;
+            _transFadeOut = false;
+            _onTransition = false;
+            _nextScreen = TB_SCREEN_TYPE_EMPTY;
+        }
+    }
+}
+TINY_BURGER static void __draw_transition(void)
+{
+    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, Fade(BLACK, _transAlpha));
 }

@@ -3,15 +3,15 @@
 
 #include "config.h"
 
-typedef enum
-{
-    SCREEN_TYPE_EMPTY = -1,
-    SCREEN_TYPE_MENU = 0,
-    SCREEN_TYPE_GAME,
+TINY_BURGER typedef enum {
+    TB_SCREEN_TYPE_EMPTY = -1,
+    TB_SCREEN_TYPE_MENU = 0,
+    TB_SCREEN_TYPE_GAME,
+    TB_SCREEN_TYPE_OPTION,
 
 } ScreenType_u;
 
-typedef struct
+TINY_BURGER typedef struct
 {
     ScreenType_u currentScreenType;
     ScreenType_u nextScreenType;
@@ -31,6 +31,11 @@ extern "C"
     TINY_BURGER void update_game(Screen_t *const);
     TINY_BURGER void draw_game(const Screen_t *const);
     TINY_BURGER void destroy_game(Screen_t **);
+
+    TINY_BURGER Screen_t *create_option(void);
+    TINY_BURGER void update_option(Screen_t *const);
+    TINY_BURGER void draw_option(const Screen_t *const);
+    TINY_BURGER void destroy_option(Screen_t **);
 
 #if defined(__cplusplus)
 }

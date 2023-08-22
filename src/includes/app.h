@@ -4,7 +4,7 @@
 #include "config.h"
 #include "screen.h"
 
-typedef struct
+TINY_BURGER typedef struct
 {
     Screen_t *screen;
 } App_t;

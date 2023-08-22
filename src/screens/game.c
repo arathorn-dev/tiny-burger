@@ -17,8 +17,8 @@ TINY_BURGER Screen_t *create_game(void)
         return NULL;
     }
 
-    screen->currentScreenType = SCREEN_TYPE_GAME;
-    screen->nextScreenType = SCREEN_TYPE_EMPTY;
+    screen->currentScreenType = TB_SCREEN_TYPE_GAME;
+    screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
@@ -30,7 +30,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
-    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, RED);
+    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_3));
 }
 
 TINY_BURGER void destroy_game(Screen_t **ptr)

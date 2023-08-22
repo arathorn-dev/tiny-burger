@@ -21,7 +21,10 @@ TINY_BURGER Screen_t *create_option(void)
 }
 TINY_BURGER void update_option(Screen_t *const screen)
 {
-    // TODO
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
+    }
 }
 TINY_BURGER void draw_option(const Screen_t *const screen)
 {

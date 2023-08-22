@@ -39,6 +39,7 @@ extern "C"
 TINY_BURGER static float _transAlpha = 0.0f;
 TINY_BURGER static bool _onTransition = false;
 TINY_BURGER static bool _transFadeOut = false;
+TINY_BURGER static ScreenType_u _currentScreen = TB_SCREEN_TYPE_EMPTY;
 TINY_BURGER static ScreenType_u _nextScreen = TB_SCREEN_TYPE_EMPTY;
 
 //----------------------------------------------------------------------------------
@@ -72,13 +73,14 @@ TINY_BURGER App_t *create_app(void)
         return NULL;
     }
 
+    app->isRunning = true;
     TraceLog(LOG_DEBUG, "App_t pointer created successfully.");
     return app;
 }
 
 TINY_BURGER void run_app(App_t *app)
 {
-    while (!WindowShouldClose())
+    while (app->isRunning)
     {
         __update_window(app);
         __draw_window(app);
@@ -128,14 +130,16 @@ TINY_BURGER static void __destroy_app(App_t **ptr)
 
 TINY_BURGER static void __update_window(App_t *app)
 {
+    // TODO: Improve this code.
     if (!_onTransition)
     {
-        if (IsKeyPressed(KEY_F1))
-            __transition_screen(app->screen, TB_SCREEN_TYPE_MENU);
-        else if (IsKeyPressed(KEY_F2))
-            __transition_screen(app->screen, TB_SCREEN_TYPE_GAME);
-        else if (IsKeyPressed(KEY_F3))
-            __transition_screen(app->screen, TB_SCREEN_TYPE_OPTION);
+        if (app->screen->nextScreenType != TB_SCREEN_TYPE_EMPTY)
+        {
+            if (app->screen->nextScreenType == TB_SCREEN_TYPE_EXIT)
+                app->isRunning = false;
+            else
+                __transition_screen(app->screen, app->screen->nextScreenType);
+        }
 
         __update_screen(app->screen);
     }
@@ -220,6 +224,7 @@ TINY_BURGER static Screen_t *__load_screen(ScreenType_u type)
     default:
         break;
     }
+    _currentScreen = type;
     return screen;
 }
 TINY_BURGER static void __unload_screen(Screen_t *screen)
@@ -257,13 +262,10 @@ TINY_BURGER static void __change_screen_to(App_t *app, ScreenType_u next)
 
 TINY_BURGER static void __transition_screen(Screen_t *screen, ScreenType_u next)
 {
-    if (screen != NULL && screen->currentScreenType != next)
-    {
-        _onTransition = true;
-        _transFadeOut = false;
-        _nextScreen = next;
-        _transAlpha = 0.0f;
-    }
+    _onTransition = true;
+    _transFadeOut = false;
+    _nextScreen = next;
+    _transAlpha = 0.0f;
 }
 TINY_BURGER static void __update_transition(App_t *app)
 {

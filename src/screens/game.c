@@ -26,7 +26,10 @@ TINY_BURGER Screen_t *create_game(void)
 
 TINY_BURGER void update_game(Screen_t *const screen)
 {
-    // TODO
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
+    }
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {

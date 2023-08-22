@@ -13,14 +13,12 @@ extern Package_t *globalPackage;
 // Static Definition.
 //----------------------------------------------------------------------------------
 
-const char *_options[__MENU_SIZE] = {
+static const char *_options[__MENU_SIZE] = {
     "start",
     "option",
     "exit"};
-
-Vector2 _optionsPosition[__MENU_SIZE];
-
-int32_t currentOption = 0;
+static Vector2 _optionsPosition[__MENU_SIZE];
+static int32_t currentOption = 0;
 
 #if defined(__cplusplus)
 extern "C"
@@ -28,9 +26,9 @@ extern "C"
 #endif
 
     TINY_BURGER static void __load_options(void);
-    TINY_BURGER static void __update_options(void);
+    TINY_BURGER static void __update_options(Screen_t *const);
     TINY_BURGER static void __draw_options(void);
-    TINY_BURGER static void __select_option(void);
+    TINY_BURGER static void __select_option(Screen_t *const);
 
 #if defined(__cplusplus)
 }
@@ -59,7 +57,7 @@ TINY_BURGER Screen_t *create_menu(void)
 
 TINY_BURGER void update_menu(Screen_t *const screen)
 {
-    __update_options();
+    __update_options(screen);
 }
 TINY_BURGER void draw_menu(const Screen_t *const screen)
 {
@@ -91,7 +89,7 @@ TINY_BURGER static void __load_options(void)
     }
 }
 
-TINY_BURGER static void __update_options(void)
+TINY_BURGER static void __update_options(Screen_t *const screen)
 {
     if (IsKeyPressed(KEY_UP))
     {
@@ -105,7 +103,7 @@ TINY_BURGER static void __update_options(void)
     }
     else if (IsKeyPressed(KEY_ENTER))
     {
-        __select_option();
+        __select_option(screen);
     }
 }
 TINY_BURGER static void __draw_options(void)
@@ -124,18 +122,18 @@ TINY_BURGER static void __draw_options(void)
     }
 }
 
-TINY_BURGER static void __select_option(void)
+TINY_BURGER static void __select_option(Screen_t *const screen)
 {
     switch (currentOption)
     {
     case 0:
-        TraceLog(LOG_INFO, ">>> MENU");
+        screen->nextScreenType = TB_SCREEN_TYPE_GAME;
         break;
     case 1:
-        TraceLog(LOG_INFO, ">>> OPTION");
+        screen->nextScreenType = TB_SCREEN_TYPE_OPTION;
         break;
     case 2:
-        TraceLog(LOG_INFO, ">>> EXIT");
+        screen->nextScreenType = TB_SCREEN_TYPE_EXIT;
         break;
     default:
         break;

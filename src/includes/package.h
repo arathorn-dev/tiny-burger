@@ -7,9 +7,14 @@ TINY_BURGER typedef enum {
     TB_FONT_TYPE_04B03 = 0
 } FontType_e;
 
+TINY_BURGER typedef enum {
+    TB_TEXTURE_TYPE_TILE = 0
+} TextureType_e;
+
 TINY_BURGER typedef struct
 {
     Font fonts[TINY_BURGER_FONT_COUNT];
+    Texture2D textures[TINY_BURGER_TEXTURE_COUNT];
 } Package_t;
 
 #if defined(__cplusplus)

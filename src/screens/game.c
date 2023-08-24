@@ -13,16 +13,20 @@ extern Package_t *globalPackage;
 
 TINY_BURGER static int32_t *_vectorDraw = NULL;
 TINY_BURGER static int32_t *_vectorPath = NULL;
+TINY_BURGER static int32_t _currentLevel = -1;
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static bool _showPath = false;
 
 TINY_BURGER static void __draw_map(void);
 
+TINY_BURGER static void __load_level(int32_t level);
+TINY_BURGER static const char *__get_level_path(int32_t level);
+
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
 
-TINY_BURGER Screen_t *create_game(const char *fileName)
+TINY_BURGER Screen_t *create_game(void)
 {
     Screen_t *screen = (Screen_t *)MemAlloc(sizeof(Screen_t *));
     if (screen == NULL)
@@ -31,8 +35,7 @@ TINY_BURGER Screen_t *create_game(const char *fileName)
         return NULL;
     }
 
-    _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
-    _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+    __load_level(0);
 
     _camera = MemAlloc(sizeof(Camera2D));
     _camera->target = (Vector2){0};
@@ -57,6 +60,18 @@ TINY_BURGER void update_game(Screen_t *const screen)
     {
         _showPath = !_showPath;
     }
+    else if (IsKeyPressed(KEY_F1))
+        __load_level(0);
+    else if (IsKeyPressed(KEY_F2))
+        __load_level(1);
+    else if (IsKeyPressed(KEY_F3))
+        __load_level(2);
+    else if (IsKeyPressed(KEY_F4))
+        __load_level(3);
+    else if (IsKeyPressed(KEY_F5))
+        __load_level(4);
+    else if (IsKeyPressed(KEY_F6))
+        __load_level(5);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
@@ -103,12 +118,51 @@ TINY_BURGER static void __draw_map(void)
                 v = _vectorPath[j + i * TINY_BURGER_MAP_WIDTH];
                 if (v > 0)
                 {
-                    DrawRectangle(position.x, position.y, TINY_BURGER_TILE, TINY_BURGER_TILE, GREEN);
+                    DrawRectangleLines(
+                        position.x,
+                        position.y - TINY_BURGER_TILE,
+                        TINY_BURGER_TILE,
+                        TINY_BURGER_TILE,
+                        GetColor(TINY_BURGER_COLOR_9));
                 }
             }
             position.x += TINY_BURGER_TILE;
         }
         position.x = 0;
         position.y += TINY_BURGER_TILE;
+    }
+}
+
+TINY_BURGER static void __load_level(int32_t level)
+{
+    if (_currentLevel != level)
+    {
+        const char *fileName = __get_level_path(level);
+        unload_draw_map(&_vectorDraw);
+        unload_path_map(&_vectorPath);
+        _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+        _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+        _currentLevel = level;
+    }
+}
+
+TINY_BURGER static const char *__get_level_path(int32_t level)
+{
+    switch (level)
+    {
+    case 0:
+        return "data/levels/level_0.csv";
+    case 1:
+        return "data/levels/level_1.csv";
+    case 2:
+        return "data/levels/level_2.csv";
+    case 3:
+        return "data/levels/level_3.csv";
+    case 4:
+        return "data/levels/level_4.csv";
+    case 5:
+        return "data/levels/level_5.csv";
+    default:
+        return NULL;
     }
 }

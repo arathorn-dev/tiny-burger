@@ -28,7 +28,7 @@ extern "C"
     TINY_BURGER void draw_menu(const Screen_t *const);
     TINY_BURGER void destroy_menu(Screen_t **);
 
-    TINY_BURGER Screen_t *create_game(void);
+    TINY_BURGER Screen_t *create_game(const char *);
     TINY_BURGER void update_game(Screen_t *const);
     TINY_BURGER void draw_game(const Screen_t *const);
     TINY_BURGER void destroy_game(Screen_t **);

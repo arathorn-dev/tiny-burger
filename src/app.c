@@ -214,7 +214,7 @@ TINY_BURGER static Screen_t *__load_screen(ScreenType_u type)
         break;
 
     case TB_SCREEN_TYPE_GAME:
-        screen = create_game();
+        screen = create_game("data/levels/level_0.csv"); // TODO: Change to way of file loading
         break;
 
     case TB_SCREEN_TYPE_OPTION:

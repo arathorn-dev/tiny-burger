@@ -8,11 +8,11 @@ extern "C"
 {
 #endif
 
-    TINY_BURGER int32_t *load_draw_map(const char *, size_t, size_t);
-    TINY_BURGER void unload_draw_map(int32_t **);
+    TINY_BURGER int32_t *load_draw_map(const char *fileName, size_t width, size_t height);
+    TINY_BURGER void unload_draw_map(int32_t **ptr);
 
-    TINY_BURGER int32_t *load_path_map(const int32_t *const, size_t, size_t);
-    TINY_BURGER void unload_path_map(int32_t **);
+    TINY_BURGER int32_t *load_path_map(const int32_t *const vectorDraw, size_t width, size_t height);
+    TINY_BURGER void unload_path_map(int32_t **ptr);
 
 #if defined(__cplusplus)
 }

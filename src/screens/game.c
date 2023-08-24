@@ -17,10 +17,18 @@ TINY_BURGER static int32_t _currentLevel = -1;
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static bool _showPath = false;
 
-TINY_BURGER static void __draw_map(void);
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
 
-TINY_BURGER static void __load_level(int32_t level);
-TINY_BURGER static const char *__get_level_path(int32_t level);
+    TINY_BURGER static void __draw_map(void);
+    TINY_BURGER static void __load_level(int32_t level);
+    TINY_BURGER static const char *__get_level_path(int32_t level);
+
+#if defined(__cplusplus)
+}
+#endif
 
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.

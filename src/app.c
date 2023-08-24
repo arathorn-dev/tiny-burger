@@ -17,19 +17,19 @@ extern "C"
 
     TINY_BURGER static void __init_window(void);
     TINY_BURGER static void __close_window(void);
-    TINY_BURGER static void __destroy_app(App_t **);
-    TINY_BURGER static void __destroy_app_pointer(App_t *);
-    TINY_BURGER static void __update_window(App_t *);
-    TINY_BURGER static void __draw_window(App_t *);
+    TINY_BURGER static void __destroy_app(App_t **ptr);
+    TINY_BURGER static void __destroy_app_pointer(App_t *app);
+    TINY_BURGER static void __update_window(App_t *app);
+    TINY_BURGER static void __draw_window(App_t *app);
 
-    TINY_BURGER static void __update_screen(Screen_t *const);
-    TINY_BURGER static void __draw_screen(const Screen_t *const);
-    TINY_BURGER static void __change_screen_to(App_t *, ScreenType_u);
-    TINY_BURGER static Screen_t *__load_screen(ScreenType_u);
+    TINY_BURGER static void __update_screen(Screen_t *const screen);
+    TINY_BURGER static void __draw_screen(const Screen_t *const screen);
+    TINY_BURGER static void __change_screen_to(App_t *app, ScreenType_u next);
+    TINY_BURGER static Screen_t *__load_screen(ScreenType_u type);
     TINY_BURGER static void __unload_screen(Screen_t *);
 
-    TINY_BURGER static void __transition_screen(Screen_t *, ScreenType_u);
-    TINY_BURGER static void __update_transition(App_t *);
+    TINY_BURGER static void __transition_screen(Screen_t *screen, ScreenType_u next);
+    TINY_BURGER static void __update_transition(App_t *app);
     TINY_BURGER static void __draw_transition(void);
 
 #if defined(__cplusplus)

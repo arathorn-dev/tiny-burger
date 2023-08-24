@@ -5,12 +5,17 @@
 // Static Definition.
 //----------------------------------------------------------------------------------
 
-TINY_BURGER static int32_t *__create_draw_vector(const char *, size_t, size_t);
-
-TINY_BURGER static char **__copy_text(const char **, int32_t);
-TINY_BURGER static void __destroy_copy_text(char ***, int32_t);
-
-TINY_BURGER static int32_t __get_path_value(const int32_t *const, size_t, size_t);
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+    TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, size_t width, size_t height);
+    TINY_BURGER static char **__copy_text(const char **text, int32_t size);
+    TINY_BURGER static void __destroy_copy_text(char ***ptr, int32_t size);
+    TINY_BURGER static int32_t __get_path_value(const int32_t *const vector, size_t i, size_t j);
+#if defined(__cplusplus)
+}
+#endif
 
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.

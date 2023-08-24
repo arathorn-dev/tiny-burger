@@ -5,11 +5,11 @@
 
 TINY_BURGER typedef enum {
     TB_FONT_TYPE_04B03 = 0
-} FontType_e;
+} FontType_u;
 
 TINY_BURGER typedef enum {
     TB_TEXTURE_TYPE_TILE = 0
-} TextureType_e;
+} TextureType_u;
 
 TINY_BURGER typedef struct
 {
@@ -23,7 +23,7 @@ extern "C"
 #endif
 
     TINY_BURGER Package_t *create_package(void);
-    TINY_BURGER void destroy_package(Package_t **);
+    TINY_BURGER void destroy_package(Package_t **ptr);
 
 #if defined(__cplusplus)
 }

@@ -26,9 +26,9 @@ extern "C"
 #endif
 
     TINY_BURGER static void __load_options(void);
-    TINY_BURGER static void __update_options(Screen_t *const);
+    TINY_BURGER static void __update_options(Screen_t *const screen);
     TINY_BURGER static void __draw_options(void);
-    TINY_BURGER static void __select_option(Screen_t *const);
+    TINY_BURGER static void __select_option(Screen_t *const screen);
 
 #if defined(__cplusplus)
 }

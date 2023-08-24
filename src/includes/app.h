@@ -16,8 +16,8 @@ extern "C"
 #endif
 
     TINY_BURGER App_t *create_app(void);
-    TINY_BURGER void run_app(App_t *);
-    TINY_BURGER void destroy_app(App_t **);
+    TINY_BURGER void run_app(App_t *app);
+    TINY_BURGER void destroy_app(App_t **ptr);
 
 #if defined(__cplusplus)
 }

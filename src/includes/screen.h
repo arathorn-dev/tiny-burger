@@ -24,19 +24,19 @@ extern "C"
 #endif
 
     TINY_BURGER Screen_t *create_menu(void);
-    TINY_BURGER void update_menu(Screen_t *const);
-    TINY_BURGER void draw_menu(const Screen_t *const);
-    TINY_BURGER void destroy_menu(Screen_t **);
+    TINY_BURGER void update_menu(Screen_t *const screen);
+    TINY_BURGER void draw_menu(const Screen_t *const screen);
+    TINY_BURGER void destroy_menu(Screen_t **ptr);
 
     TINY_BURGER Screen_t *create_game(void);
-    TINY_BURGER void update_game(Screen_t *const);
-    TINY_BURGER void draw_game(const Screen_t *const);
-    TINY_BURGER void destroy_game(Screen_t **);
+    TINY_BURGER void update_game(Screen_t *const screen);
+    TINY_BURGER void draw_game(const Screen_t *const screen);
+    TINY_BURGER void destroy_game(Screen_t **ptr);
 
     TINY_BURGER Screen_t *create_option(void);
-    TINY_BURGER void update_option(Screen_t *const);
-    TINY_BURGER void draw_option(const Screen_t *const);
-    TINY_BURGER void destroy_option(Screen_t **);
+    TINY_BURGER void update_option(Screen_t *const screen);
+    TINY_BURGER void draw_option(const Screen_t *const screen);
+    TINY_BURGER void destroy_option(Screen_t **ptr);
 
 #if defined(__cplusplus)
 }

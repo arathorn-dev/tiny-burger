@@ -9,11 +9,11 @@ extern "C"
 {
 #endif
 
-    TINY_BURGER static bool __load_fonts(Package_t *);
-    TINY_BURGER static void __unload_fonts(Package_t *);
+    TINY_BURGER static bool __load_fonts(Package_t *package);
+    TINY_BURGER static void __unload_fonts(Package_t *package);
 
-    TINY_BURGER static bool __load_textures(Package_t *);
-    TINY_BURGER static void __unload_textures(Package_t *);
+    TINY_BURGER static bool __load_textures(Package_t *package);
+    TINY_BURGER static void __unload_textures(Package_t *package);
 
 #if defined(__cplusplus)
 }

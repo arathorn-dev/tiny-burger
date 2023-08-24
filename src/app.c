@@ -180,27 +180,30 @@ TINY_BURGER static void __update_screen(Screen_t *const screen)
 
 TINY_BURGER static void __draw_screen(const Screen_t *const screen)
 {
-    switch (screen->currentScreenType)
+    if (screen != NULL)
     {
-    case TB_SCREEN_TYPE_MENU:
-        draw_menu(screen);
-        break;
+        switch (screen->currentScreenType)
+        {
+        case TB_SCREEN_TYPE_MENU:
+            draw_menu(screen);
+            break;
 
-    case TB_SCREEN_TYPE_GAME:
-        draw_game(screen);
-        break;
+        case TB_SCREEN_TYPE_GAME:
+            draw_game(screen);
+            break;
 
-    case TB_SCREEN_TYPE_OPTION:
-        draw_option(screen);
-        break;
+        case TB_SCREEN_TYPE_OPTION:
+            draw_option(screen);
+            break;
 
-    default:
-        break;
-    }
+        default:
+            break;
+        }
 
-    if (_onTransition)
-    {
-        __draw_transition();
+        if (_onTransition)
+        {
+            __draw_transition();
+        }
     }
 }
 
@@ -257,6 +260,10 @@ TINY_BURGER static void __change_screen_to(App_t *app, ScreenType_u next)
     {
         __unload_screen(app->screen);
         app->screen = __load_screen(next);
+        if (app->screen == NULL)
+        {
+            app->isRunning = false;
+        }
     }
 }
 

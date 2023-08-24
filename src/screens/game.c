@@ -1,6 +1,7 @@
 #include "../includes/screen.h"
 #include "../includes/utils.h"
 #include "../includes/package.h"
+#include "../includes/player.h"
 
 //----------------------------------------------------------------------------------
 // Global.
@@ -14,8 +15,11 @@ extern Package_t *globalPackage;
 TINY_BURGER static int32_t *_vectorDraw = NULL;
 TINY_BURGER static int32_t *_vectorPath = NULL;
 TINY_BURGER static int32_t _currentLevel = -1;
-TINY_BURGER static Camera2D *_camera = NULL;
+
 TINY_BURGER static bool _showPath = false;
+
+TINY_BURGER static Camera2D *_camera = NULL;
+TINY_BURGER static Player_t *_player = NULL;
 
 #if defined(__cplusplus)
 extern "C"
@@ -23,8 +27,9 @@ extern "C"
 #endif
 
     TINY_BURGER static void __draw_map(void);
-    TINY_BURGER static void __load_level(int32_t level);
+    TINY_BURGER static bool __load_level(int32_t level);
     TINY_BURGER static const char *__get_level_path(int32_t level);
+    TINY_BURGER static Vector2 __get_position_player(int32_t level);
 
 #if defined(__cplusplus)
 }
@@ -43,7 +48,12 @@ TINY_BURGER Screen_t *create_game(void)
         return NULL;
     }
 
-    __load_level(0);
+    if (!__load_level(0))
+    {
+        MemFree(screen);
+        screen = NULL;
+        return screen;
+    }
 
     _camera = MemAlloc(sizeof(Camera2D));
     _camera->target = (Vector2){0};
@@ -80,12 +90,15 @@ TINY_BURGER void update_game(Screen_t *const screen)
         __load_level(4);
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
+
+    update_player(_player);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_0));
     __draw_map();
+    draw_player(_player);
     EndMode2D();
 }
 
@@ -93,6 +106,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        destroy_player(&_player);
         unload_path_map(&_vectorPath);
         unload_draw_map(&_vectorDraw);
         MemFree(_camera);
@@ -141,17 +155,27 @@ TINY_BURGER static void __draw_map(void)
     }
 }
 
-TINY_BURGER static void __load_level(int32_t level)
+TINY_BURGER static bool __load_level(int32_t level)
 {
+    bool isLoaded = false;
+
     if (_currentLevel != level)
     {
-        const char *fileName = __get_level_path(level);
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
-        _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
-        _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
-        _currentLevel = level;
+
+        destroy_player(&_player);
+        _player = create_player(__get_position_player(level));
+        if (_player != NULL)
+        {
+            const char *fileName = __get_level_path(level);
+            _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+            _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+            _currentLevel = level;
+            isLoaded = true;
+        }
     }
+    return isLoaded;
 }
 
 TINY_BURGER static const char *__get_level_path(int32_t level)
@@ -173,4 +197,31 @@ TINY_BURGER static const char *__get_level_path(int32_t level)
     default:
         return NULL;
     }
+}
+
+TINY_BURGER static Vector2 __get_position_player(int32_t level)
+{
+    Vector2 position = (Vector2){0};
+    switch (level)
+    {
+    case 0:
+        position = (Vector2){8, 8};
+        break;
+    case 1:
+        position = (Vector2){8, 9};
+        break;
+    case 2:
+        position = (Vector2){8, 10};
+        break;
+    case 3:
+        position = (Vector2){8, 6};
+        break;
+    case 4:
+        position = (Vector2){12, 10};
+        break;
+    case 5:
+        position = (Vector2){8, 8};
+        break;
+    }
+    return position;
 }

@@ -87,7 +87,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
 
     player->position = position;
 }
-// TODO: Improve the code.
+
 TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor)
 {
     int32_t nextIndex = position->x + ((position->y + factor) * TINY_BURGER_MAP_WIDTH);
@@ -95,36 +95,18 @@ TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32
     int32_t currentTile = vector[currentIndex] - 1;
     if (factor < 0)
     {
-        if (nextIndex > -1)
-        {
-            if (currentTile >= 1 && currentTile <= 4)
-            {
-                position->y += 1 * factor;
-            }
-        }
-        else
-        {
-            if (factor == -1 && currentTile >= 1 && currentTile <= 2)
-                position->y += 1 * factor;
-        }
+        if (nextIndex > -1 && currentTile >= 1 && currentTile <= 4)
+            position->y += 1 * factor;
+        else if (currentTile >= 1 && currentTile <= 2)
+            position->y += 1 * factor;
     }
     else
     {
         int32_t nextTile = vector[nextIndex] - 1;
-        if (position->y >= 0)
-        {
-            if (currentTile >= -1 && currentTile <= 4 && nextTile >= 1 && nextTile <= 4)
-            {
-                position->y += 1 * factor;
-            }
-        }
-        else
-        {
-            if (nextTile >= 1 && nextTile <= 2)
-            {
-                position->y += 1 * factor;
-            }
-        }
+        if ((position->y >= 0) && (currentTile >= -1 && currentTile <= 4 && nextTile >= 1 && nextTile <= 4))
+            position->y += 1 * factor;
+        else if (nextTile >= 1 && nextTile <= 2)
+            position->y += 1 * factor;
     }
 }
 

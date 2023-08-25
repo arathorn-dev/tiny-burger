@@ -14,7 +14,7 @@ extern "C"
 #endif
 
     TINY_BURGER Player_t *create_player(Vector2 position);
-    TINY_BURGER void update_player(Player_t *const player);
+    TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector);
     TINY_BURGER void draw_player(const Player_t *const player);
     TINY_BURGER void destroy_player(Player_t **ptr);
 

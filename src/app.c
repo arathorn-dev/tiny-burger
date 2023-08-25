@@ -125,6 +125,8 @@ TINY_BURGER static void __destroy_app(App_t **ptr)
     {
         __unload_screen((*ptr)->screen);
         __destroy_app_pointer((*ptr));
+        destroy_package(&globalPackage);
+        globalPackage = NULL;
     }
 }
 

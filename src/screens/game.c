@@ -25,7 +25,6 @@ TINY_BURGER static Player_t *_player = NULL;
 extern "C"
 {
 #endif
-
     TINY_BURGER static void __draw_map(void);
     TINY_BURGER static bool __load_level(int32_t level);
     TINY_BURGER static const char *__get_level_path(int32_t level);
@@ -91,7 +90,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
 
-    update_player(_player);
+    update_player(_player, _vectorPath);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
@@ -111,6 +110,12 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
         unload_draw_map(&_vectorDraw);
         MemFree(_camera);
         _camera = NULL;
+        _vectorDraw = NULL;
+        _vectorPath = NULL;
+        _player = NULL;
+
+        _currentLevel = -1;
+        _showPath = false;
 
         TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer destroyed successfully.");
         MemFree((*ptr));
@@ -120,6 +125,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
+
 TINY_BURGER static void __draw_map(void)
 {
     Vector2 position = (Vector2){0};
@@ -163,7 +169,6 @@ TINY_BURGER static bool __load_level(int32_t level)
     {
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
-
         destroy_player(&_player);
         _player = create_player(__get_position_player(level));
         if (_player != NULL)

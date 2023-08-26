@@ -10,9 +10,14 @@ extern Package_t *globalPackage;
 // Static Definition.
 //----------------------------------------------------------------------------------
 
-static enum {
+TINY_BURGER static enum {
     PLAYER_ANIMATION_IDLE = 1,
-} Animation_u;
+} PlayerAnimation_u;
+
+TINY_BURGER static bool _isInterpolation = false;
+TINY_BURGER static float _interpolationValue = 0.0f;
+TINY_BURGER static float _interpolationMaxValue = 0.8f;
+TINY_BURGER static Vector2 _interpolationPosition = {0};
 
 #if defined(__cplusplus)
 extern "C"
@@ -22,6 +27,9 @@ extern "C"
     TINY_BURGER static void __movement_player(Player_t *const player, const int32_t *const vector);
     TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
     TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
+
+    TINY_BURGER static void __reset_interpolation(void);
+    TINY_BURGER static void __linear_interpolation(Player_t *const player);
 
 #if defined(__cplusplus)
 }
@@ -61,7 +69,14 @@ TINY_BURGER Player_t *create_player(Vector2 position)
 
 TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector)
 {
-    __movement_player(player, vector);
+    if (_isInterpolation)
+    {
+        __linear_interpolation(player);
+    }
+    else
+    {
+        __movement_player(player, vector);
+    }
     update_animation_player(player->ap);
 }
 
@@ -74,6 +89,7 @@ TINY_BURGER void destroy_player(Player_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        __reset_interpolation();
         destroy_animation_player(&((*ptr)->ap));
         MemFree((*ptr));
         (*ptr) = NULL;
@@ -104,7 +120,12 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
         __horizontal_movement(&position, vector, 1);
     }
 
-    player->position = position;
+    // player->position = position;
+    if (player->position.x != position.x || player->position.y != position.y)
+    {
+        _isInterpolation = true;
+        _interpolationPosition = position;
+    }
 }
 
 TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor)
@@ -135,4 +156,27 @@ TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int
     int32_t nextTile = vector[nextIndex] - 1;
     if (nextTile >= 0 && nextTile <= 2)
         position->x += 1 * factor;
+}
+
+TINY_BURGER static void __reset_interpolation(void)
+{
+    _interpolationValue = 0.0f;
+    _interpolationPosition = (Vector2){0};
+    _isInterpolation = false;
+}
+
+TINY_BURGER static void __linear_interpolation(Player_t *const player)
+{
+    if (_interpolationValue > _interpolationMaxValue)
+    {
+        player->position.x = _interpolationPosition.x;
+        player->position.y = _interpolationPosition.y;
+        __reset_interpolation();
+    }
+    else
+    {
+        player->position.x = player->position.x + (_interpolationPosition.x - player->position.x) * _interpolationValue;
+        player->position.y = player->position.y + (_interpolationPosition.y - player->position.y) * _interpolationValue;
+        _interpolationValue += 0.1f;
+    }
 }

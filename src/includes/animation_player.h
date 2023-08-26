@@ -26,7 +26,7 @@ extern "C"
     TINY_BURGER AnimationPlayer_t *create_animation_player(uint32_t size);
     TINY_BURGER void update_animation_player(AnimationPlayer_t *const ap);
     TINY_BURGER void set_animation_player(AnimationPlayer_t *const ap, uint32_t id);
-    TINY_BURGER void draw_animation_player(const AnimationPlayer_t *const ap, Vector2 position);
+    TINY_BURGER void draw_animation_player(const AnimationPlayer_t *const ap, Vector2 position, bool flipH);
     TINY_BURGER void add_frames_animation_player(AnimationPlayer_t *const ap, uint32_t id, Rectangle *frames, uint32_t size);
     TINY_BURGER void destroy_animation_player(AnimationPlayer_t **ptr);
 

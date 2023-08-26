@@ -11,8 +11,8 @@ extern Package_t *globalPackage;
 //----------------------------------------------------------------------------------
 
 TINY_BURGER static uint32_t _currentIndex = -1;
+TINY_BURGER static uint32_t _currentId = -1;
 TINY_BURGER static const Animation_t *_currentAnimation = NULL;
-
 TINY_BURGER static float _frameCount = 0.0f;
 
 #if defined(__cplusplus)
@@ -27,7 +27,9 @@ extern "C"
 
     TINY_BURGER static void __update_current_animnation(void);
 
-    TINY_BURGER static void __draw_current_animnation(Vector2 position);
+    TINY_BURGER static void __draw_current_animnation(Vector2 position, bool flipH);
+
+    TINY_BURGER static void __reset_values(void);
 
 #if defined(__cplusplus)
 }
@@ -64,15 +66,13 @@ TINY_BURGER void add_frames_animation_player(AnimationPlayer_t *const ap, uint32
     if (ap->currentSize < ap->maxSize)
     {
         uint32_t index = ap->currentSize;
-        ap->animation[index] = (Animation_t){
-            id,
-            size,
-            NULL};
-
-        ap->animation->frames = (Rectangle *)MemAlloc(sizeof(Rectangle) * size);
+        ap->animation[index] = (Animation_t){0};
+        ap->animation[index].id = id;
+        ap->animation[index].size = size;
+        ap->animation[index].frames = (Rectangle *)MemAlloc(sizeof(Rectangle) * size);
         // TODO: verify value is NULL
         for (size_t i = 0; i < size; ++i)
-            ap->animation->frames[i] = frames[i];
+            ap->animation[index].frames[i] = frames[i];
         ap->currentSize += 1;
     }
 }
@@ -90,15 +90,16 @@ TINY_BURGER void update_animation_player(AnimationPlayer_t *const ap)
     }
 }
 
-TINY_BURGER void draw_animation_player(const AnimationPlayer_t *const ap, Vector2 position)
+TINY_BURGER void draw_animation_player(const AnimationPlayer_t *const ap, Vector2 position, bool flipH)
 {
-    __draw_current_animnation(position);
+    __draw_current_animnation(position, flipH);
 }
 
 TINY_BURGER void set_animation_player(AnimationPlayer_t *const ap, uint32_t id)
 {
-    if (__exists_id(ap, id))
+    if (__exists_id(ap, id) && _currentId != id)
     {
+        _currentId = id;
         __set_current_animnation(ap, id);
     }
 }
@@ -107,6 +108,7 @@ TINY_BURGER void destroy_animation_player(AnimationPlayer_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        __reset_values();
         for (uint32_t i = 0; i < (*ptr)->currentSize; ++i)
         {
             uint32_t id = (*ptr)->animation[i].id;
@@ -167,13 +169,26 @@ TINY_BURGER static void __update_current_animnation(void)
     }
 }
 
-TINY_BURGER static void __draw_current_animnation(Vector2 position)
+TINY_BURGER static void __draw_current_animnation(Vector2 position, bool flipH)
 {
     DrawTextureRec(
         globalPackage->textures[TB_TEXTURE_TYPE_TILE],
-        _currentAnimation->frames[_currentIndex],
+        (Rectangle){
+            _currentAnimation->frames[_currentIndex].x,
+            _currentAnimation->frames[_currentIndex].y,
+            _currentAnimation->frames[_currentIndex].width * (flipH ? 1 : -1),
+            _currentAnimation->frames[_currentIndex].height,
+        },
         (Vector2){
             position.x * TINY_BURGER_TILE,
             position.y * TINY_BURGER_TILE},
         RAYWHITE);
+}
+
+TINY_BURGER static void __reset_values(void)
+{
+    _currentIndex = -1;
+    _currentId = -1;
+    _currentAnimation = NULL;
+    _frameCount = 0.0f;
 }

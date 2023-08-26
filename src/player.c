@@ -10,9 +10,14 @@ extern Package_t *globalPackage;
 // Static Definition.
 //----------------------------------------------------------------------------------
 
-TINY_BURGER static enum {
-    PLAYER_ANIMATION_IDLE = 1,
+TINY_BURGER typedef enum {
+    PLAYER_ANIMATION_IDLE = 10,
+    PLAYER_ANIMATION_RUN,
+    PLAYER_ANIMATION_IDLE_UP,
+    PLAYER_ANIMATION_RUN_UP,
 } PlayerAnimation_u;
+
+TINY_BURGER static bool _flipH = true;
 
 TINY_BURGER static bool _isInterpolation = false;
 TINY_BURGER static float _interpolationValue = 0.0f;
@@ -47,7 +52,7 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         return NULL;
     }
 
-    player->ap = create_animation_player(1);
+    player->ap = create_animation_player(4);
     if (player->ap == NULL)
     {
         MemFree(player);
@@ -59,7 +64,24 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         (Rectangle){TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
     };
 
+    Rectangle run[] = {
+        (Rectangle){2 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        (Rectangle){3 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+    };
+
+    Rectangle idleUp[] = {
+        (Rectangle){4 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+    };
+
+    Rectangle runUp[] = {
+        (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        (Rectangle){6 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+    };
+
     add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE, idle, 2);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN, run, 2);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_UP, idleUp, 1);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN_UP, runUp, 2);
     set_animation_player(player->ap, PLAYER_ANIMATION_IDLE);
 
     player->position = position;
@@ -82,7 +104,7 @@ TINY_BURGER void update_player(Player_t *const player, const int32_t *const vect
 
 TINY_BURGER void draw_player(const Player_t *const player)
 {
-    draw_animation_player(player->ap, player->position);
+    draw_animation_player(player->ap, player->position, _flipH);
 }
 
 TINY_BURGER void destroy_player(Player_t **ptr)
@@ -103,28 +125,51 @@ TINY_BURGER void destroy_player(Player_t **ptr)
 TINY_BURGER static void __movement_player(Player_t *const player, const int32_t *const vector)
 {
     Vector2 position = player->position;
-    if (IsKeyPressed(KEY_UP))
+    int32_t i = player->position.y;
+    int32_t j = player->position.x;
+    PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
+    uint32_t tile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+
+    if (IsKeyDown(KEY_UP))
     {
         __vertical_movement(&position, vector, -1);
     }
-    else if (IsKeyPressed(KEY_LEFT) && position.x > 0 && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    else if (IsKeyDown(KEY_LEFT) && position.x > 0 && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         __horizontal_movement(&position, vector, -1);
+        _flipH = false;
     }
-    else if (IsKeyPressed(KEY_DOWN) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    else if (IsKeyDown(KEY_DOWN) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         __vertical_movement(&position, vector, 1);
     }
-    else if (IsKeyPressed(KEY_RIGHT) && position.x < (TINY_BURGER_MAP_WIDTH - 1) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    else if (IsKeyDown(KEY_RIGHT) && position.x < (TINY_BURGER_MAP_WIDTH - 1) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         __horizontal_movement(&position, vector, 1);
+        _flipH = true;
     }
 
-    // player->position = position;
     if (player->position.x != position.x || player->position.y != position.y)
     {
+        if (player->position.y != position.y && tile >= 0 && tile <= 4)
+        {
+            animation = PLAYER_ANIMATION_RUN_UP;
+        }
+        else
+        {
+            animation = PLAYER_ANIMATION_RUN;
+        }
+        set_animation_player(player->ap, animation);
         _isInterpolation = true;
         _interpolationPosition = position;
+    }
+    else
+    {
+        if (tile >= 1 && tile <= 4)
+        {
+            animation = PLAYER_ANIMATION_IDLE_UP;
+        }
+        set_animation_player(player->ap, animation);
     }
 }
 

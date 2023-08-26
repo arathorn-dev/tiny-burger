@@ -2,10 +2,12 @@
 #define __TINY_BURGER_PLAYER_H__
 
 #include "config.h"
+#include "animation_player.h"
 
 TINY_BURGER typedef struct
 {
     Vector2 position;
+    AnimationPlayer_t *ap;
 } Player_t;
 
 #if defined(__cplusplus)

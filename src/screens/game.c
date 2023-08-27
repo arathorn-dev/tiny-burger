@@ -62,6 +62,7 @@ TINY_BURGER Screen_t *create_game(void)
 
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
+    screen->background = GetColor(TINY_BURGER_COLOR_0);
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
@@ -95,7 +96,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
     BeginMode2D(*_camera);
-    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_0));
+    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();
     draw_player(_player);
     EndMode2D();

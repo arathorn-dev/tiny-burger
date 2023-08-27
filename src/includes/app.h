@@ -8,6 +8,7 @@ TINY_BURGER typedef struct
 {
     Screen_t *screen;
     bool isRunning;
+    Color background;
 } App_t;
 
 #if defined(__cplusplus)

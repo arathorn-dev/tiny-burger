@@ -16,6 +16,7 @@ TINY_BURGER typedef struct
 {
     ScreenType_u currentScreenType;
     ScreenType_u nextScreenType;
+    Color background;
 } Screen_t;
 
 #if defined(__cplusplus)

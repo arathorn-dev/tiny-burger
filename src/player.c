@@ -143,7 +143,6 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     else if (IsKeyDown(KEY_LEFT) && position.x > 0 && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         __horizontal_movement(&position, vector, -1);
-        _flipH = false;
     }
     else if (IsKeyDown(KEY_DOWN) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
@@ -152,7 +151,6 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     else if (IsKeyDown(KEY_RIGHT) && position.x < (TINY_BURGER_MAP_WIDTH - 1) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         __horizontal_movement(&position, vector, 1);
-        _flipH = true;
     }
 
     if (player->position.x != position.x || player->position.y != position.y)
@@ -167,7 +165,6 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     else
     {
         uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
-
         if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)
             animation = PLAYER_ANIMATION_IDLE_STAIR;
         else if (downTile >= 3 && downTile <= 4 && currentTile >= 1 && currentTile <= 4)
@@ -202,8 +199,12 @@ TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int
 {
     int32_t nextIndex = (position->x + 1 * factor) + ((position->y + 1) * TINY_BURGER_MAP_WIDTH);
     int32_t nextTile = vector[nextIndex] - 1;
+
     if (nextTile >= 0 && nextTile <= 2)
+    {
+        _flipH = factor > 0;
         position->x += 1 * factor;
+    }
 }
 
 TINY_BURGER static void __reset_interpolation(void)

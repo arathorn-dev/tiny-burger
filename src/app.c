@@ -73,6 +73,7 @@ TINY_BURGER App_t *create_app(void)
     }
 
     app->isRunning = true;
+    app->background = GetColor(TINY_BURGER_COLOR_0);
     TraceLog(LOG_DEBUG, "App_t pointer created successfully.");
     return app;
 }
@@ -97,7 +98,7 @@ TINY_BURGER void destroy_app(App_t **ptr)
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __init_window(void)
 {
-    // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, TINY_BURGER_TITLE);
     SetTargetFPS(TINY_BURGER_FPS);
 
@@ -152,7 +153,7 @@ TINY_BURGER static void __update_window(App_t *app)
 
 TINY_BURGER static void __draw_window(App_t *app)
 {
-    ClearBackground(GetColor(TINY_BURGER_COLOR_0));
+    ClearBackground(app->background);
     BeginDrawing();
     __draw_screen(app->screen);
     EndDrawing();

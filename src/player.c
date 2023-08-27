@@ -13,8 +13,9 @@ extern Package_t *globalPackage;
 TINY_BURGER typedef enum {
     PLAYER_ANIMATION_IDLE = 10,
     PLAYER_ANIMATION_RUN,
-    PLAYER_ANIMATION_IDLE_UP,
-    PLAYER_ANIMATION_RUN_UP,
+    PLAYER_ANIMATION_IDLE_STAIR,
+    PLAYER_ANIMATION_IDLE_STAIR_MOV,
+    PLAYER_ANIMATION_RUN_STAIR,
 } PlayerAnimation_u;
 
 TINY_BURGER static bool _flipH = true;
@@ -52,7 +53,7 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         return NULL;
     }
 
-    player->ap = create_animation_player(4);
+    player->ap = create_animation_player(5);
     if (player->ap == NULL)
     {
         MemFree(player);
@@ -69,8 +70,12 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         (Rectangle){3 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
     };
 
-    Rectangle idleUp[] = {
+    Rectangle idleStair[] = {
         (Rectangle){4 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+    };
+
+    Rectangle idleStairUp[] = {
+        (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
     };
 
     Rectangle runUp[] = {
@@ -80,9 +85,10 @@ TINY_BURGER Player_t *create_player(Vector2 position)
 
     add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE, idle, 2);
     add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN, run, 2);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_UP, idleUp, 1);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN_UP, runUp, 2);
-    set_animation_player(player->ap, PLAYER_ANIMATION_IDLE);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
+    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
+    set_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR);
 
     player->position = position;
     TraceLog(LOG_DEBUG, "Player_t pointer created successfully.");
@@ -128,7 +134,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     int32_t i = player->position.y;
     int32_t j = player->position.x;
     PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
-    uint32_t tile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+    uint32_t currentTile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
 
     if (IsKeyDown(KEY_UP))
     {
@@ -151,26 +157,23 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
 
     if (player->position.x != position.x || player->position.y != position.y)
     {
-        if (player->position.y != position.y && tile >= 0 && tile <= 4)
-        {
-            animation = PLAYER_ANIMATION_RUN_UP;
-        }
+        if (player->position.y != position.y)
+            animation = PLAYER_ANIMATION_RUN_STAIR;
         else
-        {
             animation = PLAYER_ANIMATION_RUN;
-        }
-        set_animation_player(player->ap, animation);
         _isInterpolation = true;
         _interpolationPosition = position;
     }
     else
     {
-        if (tile >= 1 && tile <= 4)
-        {
-            animation = PLAYER_ANIMATION_IDLE_UP;
-        }
-        set_animation_player(player->ap, animation);
+        uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+
+        if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)
+            animation = PLAYER_ANIMATION_IDLE_STAIR;
+        else if (downTile >= 3 && downTile <= 4 && currentTile >= 1 && currentTile <= 4)
+            animation = PLAYER_ANIMATION_IDLE_STAIR_MOV;
     }
+    set_animation_player(player->ap, animation);
 }
 
 TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor)

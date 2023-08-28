@@ -2,6 +2,7 @@
 #include "../includes/utils.h"
 #include "../includes/package.h"
 #include "../includes/player.h"
+#include "../includes/enemy.h"
 
 //----------------------------------------------------------------------------------
 // Global.
@@ -20,6 +21,8 @@ TINY_BURGER static bool _showPath = false;
 
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
+
+TINY_BURGER static Enemy_t *_enemy = NULL;
 
 #if defined(__cplusplus)
 extern "C"
@@ -64,6 +67,8 @@ TINY_BURGER Screen_t *create_game(void)
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
 
+    _enemy = create_enemy(TB_ENEMY_TYPE_HOT_DOG, (Vector2){15, 1});
+
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
 }
@@ -92,6 +97,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
         __load_level(5);
 
     update_player(_player, _vectorPath);
+    update_enemy(_enemy);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
@@ -99,6 +105,7 @@ TINY_BURGER void draw_game(const Screen_t *const screen)
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();
     draw_player(_player);
+    draw_enemy(_enemy);
     EndMode2D();
 }
 
@@ -107,6 +114,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
     if ((*ptr) != NULL)
     {
         destroy_player(&_player);
+        destroy_enemy(&_enemy);
         unload_path_map(&_vectorPath);
         unload_draw_map(&_vectorDraw);
         MemFree(_camera);

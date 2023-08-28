@@ -9,7 +9,6 @@ extern Package_t *globalPackage;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-
 TINY_BURGER typedef enum {
     PLAYER_ANIMATION_IDLE = 10,
     PLAYER_ANIMATION_RUN,

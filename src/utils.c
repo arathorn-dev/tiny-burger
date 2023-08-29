@@ -9,10 +9,10 @@
 extern "C"
 {
 #endif
-    TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, size_t width, size_t height);
+    TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, uint32_t width, uint32_t height);
     TINY_BURGER static char **__copy_text(const char **text, int32_t size);
     TINY_BURGER static void __destroy_copy_text(char ***ptr, int32_t size);
-    TINY_BURGER static int32_t __get_path_value(const int32_t *const vector, size_t i, size_t j);
+    TINY_BURGER static int32_t __get_path_value(const int32_t *const vector, uint32_t i, uint32_t j);
 #if defined(__cplusplus)
 }
 #endif
@@ -21,7 +21,7 @@ extern "C"
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
 
-TINY_BURGER int32_t *load_draw_map(const char *fileName, size_t width, size_t height)
+TINY_BURGER int32_t *load_draw_map(const char *fileName, uint32_t width, uint32_t height)
 {
     int32_t *vector = NULL;
     if (FileExists(fileName))
@@ -47,13 +47,13 @@ TINY_BURGER void unload_draw_map(int32_t **ptr)
     }
 }
 
-TINY_BURGER int32_t *load_path_map(const int32_t *const vectorDraw, size_t width, size_t height)
+TINY_BURGER int32_t *load_path_map(const int32_t *const vectorDraw, uint32_t width, uint32_t height)
 {
     int32_t *vector = MemAlloc(sizeof(int32_t) * width * (height + 1));
 
-    for (size_t i = 0; i < height; ++i)
+    for (uint32_t i = 0; i < height; ++i)
     {
-        for (size_t j = 0; j < width; ++j)
+        for (uint32_t j = 0; j < width; ++j)
         {
             vector[j + i * width] = __get_path_value(vectorDraw, i, j);
         }
@@ -73,7 +73,7 @@ TINY_BURGER void unload_path_map(int32_t **ptr)
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
-TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, size_t width, size_t height)
+TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, uint32_t width, uint32_t height)
 {
     char *data = LoadFileText(fileName);
     int32_t *vector = MemAlloc(sizeof(int32_t) * width * height);
@@ -81,13 +81,13 @@ TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, size_t wi
     {
         int32_t rowsCount = 0;
         const char **tmpRowsText = TextSplit(data, '\n', &rowsCount);
-        char **rowsText = __copy_text(tmpRowsText, rowsCount);
+        char **rowsText = __copy_text(tmpRowsText, rowsCount - 1);
 
-        for (size_t i = 0; i < rowsCount; ++i)
+        for (uint32_t i = 0; i < rowsCount; ++i)
         {
             int32_t columnCount = 0;
             const char **columnsText = TextSplit(rowsText[i], ',', &columnCount);
-            for (size_t j = 0; j < columnCount; ++j)
+            for (uint32_t j = 0; j < columnCount; ++j)
             {
                 int32_t value = -1;
                 if (!TextIsEqual(columnsText[j], "-1"))
@@ -99,7 +99,7 @@ TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, size_t wi
             }
         }
 
-        __destroy_copy_text(&rowsText, rowsCount);
+        __destroy_copy_text(&rowsText, rowsCount - 1);
         UnloadFileText(data);
         TraceLog(LOG_INFO, "File has been closed successfully.");
     }
@@ -110,9 +110,9 @@ TINY_BURGER static char **__copy_text(const char **text, int32_t size)
 {
     char **newText = (char **)MemAlloc(sizeof(const char *) * size);
 
-    for (size_t i = 0; i < size; ++i)
+    for (uint32_t i = 0; i < size; ++i)
     {
-        size_t s = TextLength(text[i]) + 1;
+        uint32_t s = TextLength(text[i]) + 1;
         newText[i] = MemAlloc(sizeof(char) * s);
         TextCopy(newText[i], text[i]);
     }
@@ -124,7 +124,7 @@ TINY_BURGER static void __destroy_copy_text(char ***ptr, int32_t size)
 {
     if ((*ptr) != NULL)
     {
-        for (size_t i = 0; i < size; ++i)
+        for (uint32_t i = 0; i < size; ++i)
         {
             MemFree((*ptr)[i]);
             (*ptr)[i] = NULL;
@@ -134,7 +134,7 @@ TINY_BURGER static void __destroy_copy_text(char ***ptr, int32_t size)
     }
 }
 
-TINY_BURGER static int32_t __get_path_value(const int32_t *const vector, size_t i, size_t j)
+TINY_BURGER static int32_t __get_path_value(const int32_t *const vector, uint32_t i, uint32_t j)
 {
     int32_t value = 0;
     int32_t tile = vector[j + (i * TINY_BURGER_MAP_WIDTH)];

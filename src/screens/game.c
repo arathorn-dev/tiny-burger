@@ -21,7 +21,6 @@ TINY_BURGER static bool _showPath = false;
 
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
-
 TINY_BURGER static Enemy_t *_enemy = NULL;
 
 #if defined(__cplusplus)
@@ -32,6 +31,7 @@ extern "C"
     TINY_BURGER static bool __load_level(int32_t level);
     TINY_BURGER static const char *__get_level_path(int32_t level);
     TINY_BURGER static Vector2 __get_position_player(int32_t level);
+    TINY_BURGER static Vector2 __get_position_enemy(int32_t level);
 
 #if defined(__cplusplus)
 }
@@ -66,8 +66,6 @@ TINY_BURGER Screen_t *create_game(void)
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
-
-    _enemy = create_enemy(TB_ENEMY_TYPE_HOT_DOG, (Vector2){15, 1});
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
@@ -174,18 +172,19 @@ TINY_BURGER static void __draw_map(void)
 TINY_BURGER static bool __load_level(int32_t level)
 {
     bool isLoaded = false;
-
     if (_currentLevel != level)
     {
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
         destroy_player(&_player);
+        destroy_enemy(&_enemy);
         _player = create_player(__get_position_player(level));
         if (_player != NULL)
         {
             const char *fileName = __get_level_path(level);
             _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
             _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
+            _enemy = create_enemy(TB_ENEMY_TYPE_HOT_DOG, __get_position_enemy(level)); // TODO: Remove this.
             _currentLevel = level;
             isLoaded = true;
         }
@@ -236,6 +235,33 @@ TINY_BURGER static Vector2 __get_position_player(int32_t level)
         break;
     case 5:
         position = (Vector2){8, 8};
+        break;
+    }
+    return position;
+}
+
+TINY_BURGER static Vector2 __get_position_enemy(int32_t level)
+{
+    Vector2 position = (Vector2){0};
+    switch (level)
+    {
+    case 0:
+        position = (Vector2){15, 1};
+        break;
+    case 1:
+        position = (Vector2){15, 1};
+        break;
+    case 2:
+        position = (Vector2){14, 0};
+        break;
+    case 3:
+        position = (Vector2){15, 0};
+        break;
+    case 4:
+        position = (Vector2){1, 0};
+        break;
+    case 5:
+        position = (Vector2){1, 0};
         break;
     }
     return position;

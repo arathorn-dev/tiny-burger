@@ -19,7 +19,6 @@ TINY_BURGER typedef enum {
 
 TINY_BURGER static bool _flipH = true;
 
-TINY_BURGER static bool _isInterpolation = false;
 TINY_BURGER static float _interpolationValue = 0.0f;
 TINY_BURGER static float _interpolationMaxValue = 0.8f;
 TINY_BURGER static Vector2 _interpolationPosition = {0};
@@ -33,7 +32,7 @@ extern "C"
     TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
     TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
 
-    TINY_BURGER static void __reset_interpolation(void);
+    TINY_BURGER static void __reset_interpolation(Player_t *const player);
     TINY_BURGER static void __linear_interpolation(Player_t *const player);
 
 #if defined(__cplusplus)
@@ -90,13 +89,14 @@ TINY_BURGER Player_t *create_player(Vector2 position)
     set_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR);
 
     player->position = position;
+    player->isInterpolation = false;
     TraceLog(LOG_DEBUG, "Player_t pointer created successfully.");
     return player;
 }
 
 TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector)
 {
-    if (_isInterpolation)
+    if (player->isInterpolation)
     {
         __linear_interpolation(player);
     }
@@ -116,7 +116,7 @@ TINY_BURGER void destroy_player(Player_t **ptr)
 {
     if ((*ptr) != NULL)
     {
-        __reset_interpolation();
+        __reset_interpolation((*ptr));
         destroy_animation_player(&((*ptr)->ap));
         MemFree((*ptr));
         (*ptr) = NULL;
@@ -158,7 +158,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
             animation = PLAYER_ANIMATION_RUN_STAIR;
         else
             animation = PLAYER_ANIMATION_RUN;
-        _isInterpolation = true;
+        player->isInterpolation = true;
         _interpolationPosition = position;
     }
     else
@@ -206,11 +206,11 @@ TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int
     }
 }
 
-TINY_BURGER static void __reset_interpolation(void)
+TINY_BURGER static void __reset_interpolation(Player_t *const player)
 {
     _interpolationValue = 0.0f;
     _interpolationPosition = (Vector2){0};
-    _isInterpolation = false;
+    player->isInterpolation = false;
 }
 
 TINY_BURGER static void __linear_interpolation(Player_t *const player)
@@ -219,7 +219,7 @@ TINY_BURGER static void __linear_interpolation(Player_t *const player)
     {
         player->position.x = _interpolationPosition.x;
         player->position.y = _interpolationPosition.y;
-        __reset_interpolation();
+        __reset_interpolation(player);
     }
     else
     {

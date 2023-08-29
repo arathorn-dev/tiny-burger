@@ -20,7 +20,7 @@ TINY_BURGER typedef struct
 extern "C"
 {
 #endif
-    TINY_BURGER VectorList_t get_path(const uint32_t *const map, Vector2 start, Vector2 end);
+    TINY_BURGER VectorList_t get_path(const int32_t *const map, Vector2 start, Vector2 end);
 
 #if defined(__cplusplus)
 }

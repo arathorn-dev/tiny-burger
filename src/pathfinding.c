@@ -5,31 +5,28 @@
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-
-#define TEST_WIDTH 6
-#define TEST_HEIGHT 6
-
-TINY_BURGER Path_t *openList[TEST_WIDTH * TEST_HEIGHT];
-TINY_BURGER Path_t *closeList[TEST_WIDTH * TEST_HEIGHT];
+TINY_BURGER Path_t *openList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
+TINY_BURGER Path_t *closeList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
     TINY_BURGER static void __init_list(void);
-    TINY_BURGER static void __evaluate_path(const uint32_t *const map, Path_t *path, Vector2 end);
+    TINY_BURGER static void __evaluate_path(const int32_t *const map, Path_t *path, Vector2 end);
     TINY_BURGER static void __push_path_to_list(Path_t **list, Path_t *path);
     TINY_BURGER static void __remove_path_to_list(Path_t **list, Path_t *path);
     TINY_BURGER static Path_t *__get_path_open_list(void);
     TINY_BURGER static bool __exists_value_list(Path_t **list, Vector2 value);
     TINY_BURGER static uint32_t __get_heuristic_value(Vector2 start, Vector2 end);
-    TINY_BURGER static void __create_path(const uint32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end);
+    TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end);
     TINY_BURGER static void __set_path_list(Path_t **list, Vector2 value, uint32_t weight);
 
     TINY_BURGER static void __destroy(void);
     TINY_BURGER static void __destroy_path(Path_t **ptr);
     TINY_BURGER static uint32_t __get_size_path(Path_t *path);
     TINY_BURGER static void __create_vertor_list(VectorList_t *vectorList, Path_t *path);
+    TINY_BURGER static bool __is_fill_open_list(void);
 
 #if defined(__cplusplus)
 }
@@ -38,7 +35,7 @@ extern "C"
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
-TINY_BURGER VectorList_t get_path(const uint32_t *const map, Vector2 start, Vector2 end)
+TINY_BURGER VectorList_t get_path(const int32_t *const map, Vector2 start, Vector2 end)
 {
     VectorList_t vectorList = (VectorList_t){0};
     vectorList.vector = NULL;
@@ -50,8 +47,7 @@ TINY_BURGER VectorList_t get_path(const uint32_t *const map, Vector2 start, Vect
     __init_list();
     __create_path(map, &path, NULL, start, end);
     __push_path_to_list(openList, path);
-
-    while (result == NULL)
+    while (result == NULL && __is_fill_open_list())
     {
         Path_t *currentPath = __get_path_open_list();
         if (currentPath == NULL)
@@ -64,7 +60,6 @@ TINY_BURGER VectorList_t get_path(const uint32_t *const map, Vector2 start, Vect
 
     __create_vertor_list(&vectorList, result);
     __destroy();
-
     return vectorList;
 }
 
@@ -73,17 +68,17 @@ TINY_BURGER VectorList_t get_path(const uint32_t *const map, Vector2 start, Vect
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __init_list(void)
 {
-    for (size_t i = 0; i < TEST_HEIGHT; ++i)
+    for (size_t i = 0; i < TINY_BURGER_MAP_HEIGHT; ++i)
     {
-        for (size_t j = 0; j < TEST_WIDTH; ++j)
+        for (size_t j = 0; j < TINY_BURGER_MAP_WIDTH; ++j)
         {
-            openList[j + i * TEST_WIDTH] = NULL;
-            closeList[j + i * TEST_WIDTH] = NULL;
+            openList[j + i * TINY_BURGER_MAP_WIDTH] = NULL;
+            closeList[j + i * TINY_BURGER_MAP_WIDTH] = NULL;
         }
     }
 }
 
-TINY_BURGER static void __evaluate_path(const uint32_t *const map, Path_t *path, Vector2 end)
+TINY_BURGER static void __evaluate_path(const int32_t *const map, Path_t *path, Vector2 end)
 {
     Path_t *up = NULL;
     Path_t *right = NULL;
@@ -97,13 +92,13 @@ TINY_BURGER static void __evaluate_path(const uint32_t *const map, Path_t *path,
         __create_path(map, &up, path, value, end);
     }
     // right
-    if (path->value.x < (TEST_WIDTH - 1))
+    if (path->value.x < (TINY_BURGER_MAP_WIDTH - 1))
     {
         Vector2 value = (Vector2){path->value.x + 1, path->value.y};
         __create_path(map, &right, path, value, end);
     }
     // down
-    if (path->value.y < (TEST_HEIGHT - 1))
+    if (path->value.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
         Vector2 value = (Vector2){path->value.x, path->value.y + 1};
         __create_path(map, &down, path, value, end);
@@ -128,7 +123,7 @@ TINY_BURGER static void __push_path_to_list(Path_t **list, Path_t *path)
 {
     if (path != NULL)
     {
-        size_t size = TEST_WIDTH * TEST_HEIGHT;
+        size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
         for (size_t i = 0; i < size; ++i)
         {
             if (list[i] == NULL)
@@ -143,7 +138,7 @@ TINY_BURGER static void __push_path_to_list(Path_t **list, Path_t *path)
 TINY_BURGER static bool __exists_value_list(Path_t **list, Vector2 value)
 {
     bool result = false;
-    size_t size = TEST_WIDTH * TEST_HEIGHT;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
 
     for (size_t i = 0; i < size; ++i)
     {
@@ -163,14 +158,15 @@ TINY_BURGER static uint32_t __get_heuristic_value(Vector2 start, Vector2 end)
     return value;
 }
 
-TINY_BURGER static void __create_path(const uint32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end)
+TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end)
 {
-    uint32_t index = value.x + value.y * TEST_WIDTH;
-    uint32_t elem = map[index]; // TODO: validate -1
+    uint32_t index = value.x + value.y * TINY_BURGER_MAP_WIDTH;
+    int32_t elem = map[index] - 1;
     uint32_t weight = path == NULL ? 0 : path->weight;
     uint32_t heuristic = __get_heuristic_value(value, end);
     uint32_t newWeight = TB_PATH_SIZE + heuristic + weight;
-    if (elem == 0)
+
+    if (elem >= 0)
     {
         bool existsInCloseList = __exists_value_list(closeList, value);
         bool existsInOpenList = __exists_value_list(openList, value);
@@ -190,7 +186,7 @@ TINY_BURGER static void __create_path(const uint32_t *const map, Path_t **newPat
 
 TINY_BURGER static void __remove_path_to_list(Path_t **list, Path_t *path)
 {
-    size_t size = TEST_WIDTH * TEST_HEIGHT;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
     for (size_t i = 0; i < size; ++i)
     {
         if (list[i] == path)
@@ -204,7 +200,7 @@ TINY_BURGER static void __remove_path_to_list(Path_t **list, Path_t *path)
 TINY_BURGER static Path_t *__get_path_open_list(void)
 {
     Path_t *path = NULL;
-    size_t size = TEST_WIDTH * TEST_HEIGHT;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
     uint32_t weight = 10000000;
 
     for (size_t i = 0; i < size; ++i)
@@ -221,7 +217,7 @@ TINY_BURGER static Path_t *__get_path_open_list(void)
 
 TINY_BURGER static void __set_path_list(Path_t **list, Vector2 value, uint32_t weight)
 {
-    size_t size = TEST_WIDTH * TEST_HEIGHT;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
     for (size_t i = 0; i < size; ++i)
     {
         if (list[i] != NULL && list[i]->value.x == value.x && list[i]->value.y == value.y)
@@ -234,7 +230,7 @@ TINY_BURGER static void __set_path_list(Path_t **list, Vector2 value, uint32_t w
 
 TINY_BURGER static void __destroy(void)
 {
-    size_t size = TEST_WIDTH * TEST_HEIGHT;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
     for (size_t i = 0; i < size; ++i)
     {
         __destroy_path(&openList[i]);
@@ -284,4 +280,20 @@ TINY_BURGER static void __create_vertor_list(VectorList_t *vectorList, Path_t *p
             }
         }
     }
+}
+
+TINY_BURGER static bool __is_fill_open_list(void)
+{
+    bool isFill = false;
+    size_t size = TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT;
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (openList[i] != NULL)
+        {
+            isFill = true;
+            break;
+        }
+    }
+
+    return isFill;
 }

@@ -8,6 +8,7 @@ TINY_BURGER typedef struct
 {
     Vector2 position;
     AnimationPlayer_t *ap;
+    bool isInterpolation;
 } Player_t;
 
 #if defined(__cplusplus)

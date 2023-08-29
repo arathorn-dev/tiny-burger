@@ -97,10 +97,11 @@ TINY_BURGER void update_game(Screen_t *const screen)
         __load_level(5);
 
     update_player(_player, _vectorPath);
-    update_enemy(_enemy);
+    update_enemy(_enemy, _vectorPath, _player);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
+    DrawFPS(0, 0);
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();

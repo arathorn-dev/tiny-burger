@@ -16,6 +16,11 @@ TINY_BURGER typedef struct
     uint32_t maxSize;
     uint32_t currentSize;
 
+    uint32_t currentIndex;
+    uint32_t currentId;
+    Animation_t *currentAnimation;
+    float frameCount;
+
 } AnimationPlayer_t;
 
 #if defined(__cplusplus)

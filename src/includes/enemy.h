@@ -19,6 +19,10 @@ TINY_BURGER typedef struct
 
     Vector2 playerPosition;
     Vector2 vectorList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
+    uint32_t vectorListIndex;
+    bool isInterpolation;
+    bool flipH;
+    float interpolationValue;
 } Enemy_t;
 
 #if defined(__cplusplus)

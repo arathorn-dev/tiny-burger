@@ -231,7 +231,9 @@ TINY_BURGER static Vector2 __get_position_player(int32_t level)
         position = (Vector2){8, 6};
         break;
     case 4:
-        position = (Vector2){12, 10};
+        // position = (Vector2){12, 10};
+        // position = (Vector2){13, -1};
+        position = (Vector2){10, 1};
         break;
     case 5:
         position = (Vector2){8, 8};

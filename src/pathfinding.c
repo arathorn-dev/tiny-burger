@@ -8,6 +8,14 @@
 TINY_BURGER Path_t *openList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
 TINY_BURGER Path_t *closeList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
 
+TINY_BURGER typedef enum {
+    TB_PATH_DIR_NONE = -1,
+    TB_PATH_DIR_UP = 0,
+    TB_PATH_DIR_RIGHT,
+    TB_PATH_DIR_DOWN,
+    TB_PATH_DIR_LEFT
+} PathDirection_t;
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -19,7 +27,7 @@ extern "C"
     TINY_BURGER static Path_t *__get_path_open_list(void);
     TINY_BURGER static bool __exists_value_list(Path_t **list, Vector2 value);
     TINY_BURGER static uint32_t __get_heuristic_value(Vector2 start, Vector2 end);
-    TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end);
+    TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end, PathDirection_t dir);
     TINY_BURGER static void __set_path_list(Path_t **list, Vector2 value, uint32_t weight);
 
     TINY_BURGER static void __destroy(void);
@@ -45,7 +53,7 @@ TINY_BURGER VectorList_t get_path(const int32_t *const map, Vector2 start, Vecto
     Path_t *path = NULL;
 
     __init_list();
-    __create_path(map, &path, NULL, start, end);
+    __create_path(map, &path, NULL, start, end, TB_PATH_DIR_NONE);
     __push_path_to_list(openList, path);
     while (result == NULL && __is_fill_open_list())
     {
@@ -88,26 +96,26 @@ TINY_BURGER static void __evaluate_path(const int32_t *const map, Path_t *path, 
     // up
     if (path->value.y > 0)
     {
-        Vector2 value = (Vector2){path->value.x, path->value.y - 1};
-        __create_path(map, &up, path, value, end);
+        Vector2 newValue = (Vector2){path->value.x, path->value.y - 1};
+        __create_path(map, &up, path, newValue, end, TB_PATH_DIR_UP);
     }
     // right
     if (path->value.x < (TINY_BURGER_MAP_WIDTH - 1))
     {
-        Vector2 value = (Vector2){path->value.x + 1, path->value.y};
-        __create_path(map, &right, path, value, end);
+        Vector2 newValue = (Vector2){path->value.x + 1, path->value.y};
+        __create_path(map, &right, path, newValue, end, TB_PATH_DIR_RIGHT);
     }
     // down
     if (path->value.y < (TINY_BURGER_MAP_HEIGHT - 1))
     {
-        Vector2 value = (Vector2){path->value.x, path->value.y + 1};
-        __create_path(map, &down, path, value, end);
+        Vector2 newValue = (Vector2){path->value.x, path->value.y + 1};
+        __create_path(map, &down, path, newValue, end, TB_PATH_DIR_DOWN);
     }
     // left
     if (path->value.x > 0)
     {
-        Vector2 value = (Vector2){path->value.x - 1, path->value.y};
-        __create_path(map, &left, path, value, end);
+        Vector2 newValue = (Vector2){path->value.x - 1, path->value.y};
+        __create_path(map, &left, path, newValue, end, TB_PATH_DIR_LEFT);
     }
 
     __push_path_to_list(openList, up);
@@ -158,15 +166,32 @@ TINY_BURGER static uint32_t __get_heuristic_value(Vector2 start, Vector2 end)
     return value;
 }
 
-TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end)
+TINY_BURGER static void __create_path(const int32_t *const map, Path_t **newPath, Path_t *path, Vector2 value, Vector2 end, PathDirection_t dir)
 {
-    uint32_t index = value.x + value.y * TINY_BURGER_MAP_WIDTH;
+    int32_t index = value.x + value.y * TINY_BURGER_MAP_WIDTH;
     int32_t elem = map[index] - 1;
     uint32_t weight = path == NULL ? 0 : path->weight;
     uint32_t heuristic = __get_heuristic_value(value, end);
     uint32_t newWeight = TB_PATH_SIZE + heuristic + weight;
 
-    if (elem >= 0)
+    // ----
+    // TODO: take this code to a function.
+    bool flag = true;
+    if (dir == TB_PATH_DIR_UP)
+    {
+        int32_t i = path->value.x + (path->value.y - 1) * TINY_BURGER_MAP_WIDTH;
+        int32_t currentTile = map[i] - 1;
+        flag = currentTile >= 1 && currentTile <= 4;
+    }
+    else if (dir == TB_PATH_DIR_DOWN)
+    {
+        int32_t i = path->value.x + path->value.y * TINY_BURGER_MAP_WIDTH;
+        int32_t currentTile = map[i] - 1;
+        flag = currentTile >= 1 && currentTile <= 4;
+    }
+    // ----
+
+    if (flag && elem >= 0)
     {
         bool existsInCloseList = __exists_value_list(closeList, value);
         bool existsInOpenList = __exists_value_list(openList, value);

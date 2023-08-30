@@ -57,6 +57,7 @@ TINY_BURGER void update_enemy(Enemy_t *const enemy, const int32_t *const map, co
         playerPosition.y = player->position.y + 1;
 
         enemy->vectorList = get_path(map, enemyPosition, playerPosition);
+        // enemy->vectorList = get_path(map, playerPosition, enemyPosition);
         enemy->playerPosition.x = player->position.x;
         enemy->playerPosition.y = player->position.y;
     }
@@ -79,7 +80,7 @@ TINY_BURGER void draw_enemy(const Enemy_t *const enemy)
                 (enemy->vectorList.vector[i].y - 1) * TINY_BURGER_TILE,
                 TINY_BURGER_TILE,
                 TINY_BURGER_TILE,
-                GREEN);
+                GetColor(TINY_BURGER_COLOR_3));
         }
     }
 }

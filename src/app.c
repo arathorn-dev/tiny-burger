@@ -100,6 +100,7 @@ TINY_BURGER static void __init_window(void)
 {
     // SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, TINY_BURGER_TITLE);
+    HideCursor();
     SetTargetFPS(TINY_BURGER_FPS);
 
 #if defined(TINY_BURGER_DEBUG)
@@ -133,21 +134,24 @@ TINY_BURGER static void __destroy_app(App_t **ptr)
 TINY_BURGER static void __update_window(App_t *app)
 {
     // TODO: Improve this code.
-    if (!_onTransition)
+    if (app->screen != NULL)
     {
-        if (app->screen->nextScreenType != TB_SCREEN_TYPE_EMPTY)
+        if (!_onTransition)
         {
-            if (app->screen->nextScreenType == TB_SCREEN_TYPE_EXIT)
-                app->isRunning = false;
+            if (app->screen->nextScreenType != TB_SCREEN_TYPE_EMPTY)
+            {
+                if (app->screen->nextScreenType == TB_SCREEN_TYPE_EXIT)
+                    app->isRunning = false;
+                else
+                    __transition_screen(app->screen, app->screen->nextScreenType);
+            }
             else
-                __transition_screen(app->screen, app->screen->nextScreenType);
+                __update_screen(app->screen);
         }
-
-        __update_screen(app->screen);
-    }
-    else
-    {
-        __update_transition(app);
+        else
+        {
+            __update_transition(app);
+        }
     }
 }
 

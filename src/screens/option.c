@@ -6,7 +6,7 @@
 
 TINY_BURGER Screen_t *create_option(void)
 {
-    Screen_t *screen = (Screen_t *)MemAlloc(sizeof(Screen_t *));
+    Screen_t *screen = (Screen_t *)MemAlloc(sizeof(Screen_t));
     if (screen == NULL)
     {
         TraceLog(LOG_DEBUG, "[OPTION] Error to create a Screen_t pointer.");

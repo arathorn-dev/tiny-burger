@@ -39,7 +39,7 @@ extern "C"
 
 TINY_BURGER Screen_t *create_menu(void)
 {
-    Screen_t *screen = (Screen_t *)MemAlloc(sizeof(Screen_t *));
+    Screen_t *screen = (Screen_t *)MemAlloc(sizeof(Screen_t));
     if (screen == NULL)
     {
         TraceLog(LOG_DEBUG, "[MENU] Error to create a Screen_t pointer.");

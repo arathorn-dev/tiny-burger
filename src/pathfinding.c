@@ -33,7 +33,7 @@ extern "C"
     TINY_BURGER static void __destroy(void);
     TINY_BURGER static void __destroy_path(Path_t **ptr);
     TINY_BURGER static uint32_t __get_size_path(Path_t *path);
-    TINY_BURGER static void __create_vertor_list(VectorList_t *vectorList, Path_t *path);
+    TINY_BURGER static void __create_vertor_list(Vector2 *vectorList, Path_t *path);
     TINY_BURGER static bool __is_fill_open_list(void);
 
 #if defined(__cplusplus)
@@ -43,12 +43,8 @@ extern "C"
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
-TINY_BURGER VectorList_t get_path(const int32_t *const map, Vector2 start, Vector2 end)
+TINY_BURGER void get_path(Vector2 *vectorList, const int32_t *const map, Vector2 start, Vector2 end)
 {
-    VectorList_t vectorList = (VectorList_t){0};
-    vectorList.vector = NULL;
-    vectorList.size = 0;
-
     Path_t *result = NULL;
     Path_t *path = NULL;
 
@@ -66,9 +62,8 @@ TINY_BURGER VectorList_t get_path(const int32_t *const map, Vector2 start, Vecto
             __evaluate_path(map, currentPath, end);
     }
 
-    __create_vertor_list(&vectorList, result);
+    __create_vertor_list(vectorList, result);
     __destroy();
-    return vectorList;
 }
 
 //----------------------------------------------------------------------------------
@@ -285,21 +280,19 @@ TINY_BURGER static uint32_t __get_size_path(Path_t *path)
     return size;
 }
 
-TINY_BURGER static void __create_vertor_list(VectorList_t *vectorList, Path_t *path)
+TINY_BURGER static void __create_vertor_list(Vector2 *vectorList, Path_t *path)
 {
     if (path != NULL)
     {
         uint32_t size = __get_size_path(path);
         if (size > 0)
         {
-            vectorList->size = size;
-            vectorList->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * size);
-
             Path_t *auxPath = path;
             uint32_t i = 0;
             while (auxPath != NULL)
             {
-                vectorList->vector[i] = auxPath->value;
+                vectorList[i].x = auxPath->value.x;
+                vectorList[i].y = auxPath->value.y;
                 ++i;
                 auxPath = auxPath->prev;
             }

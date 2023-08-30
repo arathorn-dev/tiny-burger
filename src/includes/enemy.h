@@ -3,7 +3,6 @@
 
 #include "config.h"
 #include "animation_player.h"
-#include "pathfinding.h"
 #include "player.h"
 
 TINY_BURGER typedef enum {
@@ -19,7 +18,7 @@ TINY_BURGER typedef struct
     AnimationPlayer_t *ap;
 
     Vector2 playerPosition;
-    VectorList_t vectorList;
+    Vector2 vectorList[TINY_BURGER_MAP_WIDTH * TINY_BURGER_MAP_HEIGHT];
 } Enemy_t;
 
 #if defined(__cplusplus)

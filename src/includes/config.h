@@ -1,9 +1,9 @@
 #ifndef __TINY_BURGER_CONFIG_H__
 #define __TINY_BURGER_CONFIG_H__
 
+#include <stdint.h>
 #include "raylib.h"
 #include "raymath.h"
-#include "stdint.h"
 
 #define TINY_BURGER
 

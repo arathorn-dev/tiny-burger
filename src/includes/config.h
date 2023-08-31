@@ -27,6 +27,8 @@
 #define TINY_BURGER_FONT_PATH_04B03 "data/fonts/04B_03__.TTF"
 #define TINY_BURGER_TEXTURE_PATH_TILE "data/sprites/tiny_burger16.png"
 
+#define TINY_BURGER_INTERPOLATION_MAX_VALUE 0.8f
+
 #define TINY_BURGER_COLOR_0 0x28282eff
 #define TINY_BURGER_COLOR_1 0x6c5671ff
 #define TINY_BURGER_COLOR_2 0xd9c8bfff

@@ -184,7 +184,7 @@ TINY_BURGER static bool __load_level(int32_t level)
             const char *fileName = __get_level_path(level);
             _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
             _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
-            _enemy = create_enemy(TB_ENEMY_TYPE_HOT_DOG, __get_position_enemy(level)); // TODO: Remove this.
+            _enemy = create_enemy(TB_ENEMY_TYPE_EGG, __get_position_enemy(level)); // TODO: Remove this.
             _currentLevel = level;
             isLoaded = true;
         }

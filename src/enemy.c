@@ -10,16 +10,6 @@ extern Package_t *globalPackage;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-TINY_BURGER static float _interpolationMaxValue = 0.8f;
-
-TINY_BURGER typedef enum {
-    ENEMY_ANIMATION_IDLE = 10,
-    ENEMY_ANIMATION_RUN,
-    ENEMY_ANIMATION_IDLE_STAIR,
-    ENEMY_ANIMATION_IDLE_STAIR_MOV,
-    ENEMY_ANIMATION_RUN_STAIR,
-} EnemyAnimation_u;
-
 #if defined(__cplusplus)
 extern "C"
 {
@@ -29,9 +19,8 @@ extern "C"
     TINY_BURGER static void __destroy_vector_list(Enemy_t *enemy);
     TINY_BURGER static void __update_enemy_path(Enemy_t *const enemy, const int32_t *const map, const Player_t *const player);
     TINY_BURGER static void __movement(Enemy_t *const enemy);
-
     TINY_BURGER static void __linear_interpolation(Enemy_t *const enemy);
-
+    TINY_BURGER static AnimationPlayer_t *__init_animation_player(EnemyType_u type);
 #if defined(__cplusplus)
 }
 #endif
@@ -47,48 +36,16 @@ TINY_BURGER Enemy_t *create_enemy(EnemyType_u type, Vector2 position)
         return NULL;
     }
 
-    enemy->position = position;
-    enemy->type = type;
-    // ----
-    enemy->ap = create_animation_player(5);
-    enemy->flipH = false;
+    enemy->ap = __init_animation_player(type);
     if (enemy->ap == NULL)
     {
         MemFree(enemy);
         enemy = NULL;
         return enemy;
     }
-    uint32_t posY = 1;
-    Rectangle idle[] = {
-        (Rectangle){0, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle run[] = {
-        (Rectangle){2 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){3 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle idleStair[] = {
-        (Rectangle){4 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle idleStairUp[] = {
-        (Rectangle){5 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle runUp[] = {
-        (Rectangle){5 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){6 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    add_frames_animation_player(enemy->ap, ENEMY_ANIMATION_IDLE, idle, 2);
-    add_frames_animation_player(enemy->ap, ENEMY_ANIMATION_RUN, run, 2);
-    add_frames_animation_player(enemy->ap, ENEMY_ANIMATION_IDLE_STAIR, idleStair, 1);
-    add_frames_animation_player(enemy->ap, ENEMY_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
-    add_frames_animation_player(enemy->ap, ENEMY_ANIMATION_RUN_STAIR, runUp, 2);
-    set_animation_player(enemy->ap, ENEMY_ANIMATION_IDLE_STAIR);
-    // ----
+    enemy->flipH = false;
+    enemy->position = position;
+    enemy->type = type;
     enemy->interpolationValue = 0;
     enemy->isInterpolation = false;
 
@@ -205,7 +162,7 @@ TINY_BURGER static void __linear_interpolation(Enemy_t *const enemy)
 
     if (position.x != -100)
     {
-        if (enemy->interpolationValue > _interpolationMaxValue)
+        if (enemy->interpolationValue > TINY_BURGER_INTERPOLATION_MAX_VALUE)
         {
             enemy->position.x = position.x;
             enemy->position.y = position.y;
@@ -222,4 +179,45 @@ TINY_BURGER static void __linear_interpolation(Enemy_t *const enemy)
             enemy->interpolationValue += 0.08f;
         }
     }
+}
+
+TINY_BURGER static AnimationPlayer_t *__init_animation_player(EnemyType_u type)
+{
+    AnimationPlayer_t *ap = create_animation_player(5);
+    if (ap != NULL)
+    {
+        uint32_t posY = type + 1;
+        Rectangle idle[] = {
+            (Rectangle){0, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle run[] = {
+            (Rectangle){2 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){3 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle idleStair[] = {
+            (Rectangle){4 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle idleStairUp[] = {
+            (Rectangle){5 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle runUp[] = {
+            (Rectangle){5 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){6 * TINY_BURGER_TILE, posY * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        add_frames_animation_player(ap, ENEMY_ANIMATION_IDLE, idle, 2);
+        add_frames_animation_player(ap, ENEMY_ANIMATION_RUN, run, 2);
+        add_frames_animation_player(ap, ENEMY_ANIMATION_IDLE_STAIR, idleStair, 1);
+        add_frames_animation_player(ap, ENEMY_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
+        add_frames_animation_player(ap, ENEMY_ANIMATION_RUN_STAIR, runUp, 2);
+        set_animation_player(ap, ENEMY_ANIMATION_IDLE_STAIR);
+        set_frame_add_animation_player(ap, 0.8f);
+    }
+
+    return ap;
 }

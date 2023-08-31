@@ -6,9 +6,9 @@
 #include "player.h"
 
 TINY_BURGER typedef enum {
-    TB_ENEMY_TYPE_HOT_DOG = 0,
+    TB_ENEMY_TYPE_PICKLE = 0,
     TB_ENEMY_TYPE_EGG,
-    TB_ENEMY_TYPE_PICKLE,
+    TB_ENEMY_TYPE_HOT_DOG
 } EnemyType_u;
 
 TINY_BURGER typedef struct

@@ -51,6 +51,7 @@ TINY_BURGER AnimationPlayer_t *create_animation_player(uint32_t size)
     ap->currentId = -1;
     ap->currentAnimation = NULL;
     ap->frameCount = 0.0f;
+    ap->frameValue = 0.5f;
     return ap;
 }
 
@@ -79,7 +80,7 @@ TINY_BURGER void update_animation_player(AnimationPlayer_t *const ap)
     }
     else
     {
-        ap->frameCount += 0.5;
+        ap->frameCount += ap->frameValue;
     }
 }
 
@@ -95,6 +96,11 @@ TINY_BURGER void set_animation_player(AnimationPlayer_t *const ap, uint32_t id)
         ap->currentId = id;
         __set_current_animnation(ap, id);
     }
+}
+
+TINY_BURGER void set_frame_add_animation_player(AnimationPlayer_t *const ap, float value)
+{
+    ap->frameValue = value;
 }
 
 TINY_BURGER void destroy_animation_player(AnimationPlayer_t **ptr)

@@ -17,7 +17,7 @@
 #define TINY_BURGER_MAP_WIDTH 17
 #define TINY_BURGER_MAP_HEIGHT 12
 
-#define TINY_BURGER_TILE 8
+#define TINY_BURGER_TILE 16
 
 #define TINY_BURGER_FONT_COUNT 1
 #define TINY_BURGER_TEXTURE_COUNT 1
@@ -25,7 +25,7 @@
 #define TINY_BURGER_FONT_SIZE 24
 
 #define TINY_BURGER_FONT_PATH_04B03 "data/fonts/04B_03__.TTF"
-#define TINY_BURGER_TEXTURE_PATH_TILE "data/sprites/tiny_burger.png"
+#define TINY_BURGER_TEXTURE_PATH_TILE "data/sprites/tiny_burger16.png"
 
 #define TINY_BURGER_COLOR_0 0x28282eff
 #define TINY_BURGER_COLOR_1 0x6c5671ff

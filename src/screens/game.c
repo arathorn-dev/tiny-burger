@@ -61,7 +61,7 @@ TINY_BURGER Screen_t *create_game(void)
     _camera->target = (Vector2){0};
     _camera->offset = (Vector2){48, 68};
     _camera->rotation = 0.0f;
-    _camera->zoom = 4.0f;
+    _camera->zoom = 2.0f;
 
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
@@ -145,7 +145,7 @@ TINY_BURGER static void __draw_map(void)
             int32_t v = _vectorDraw[j + i * TINY_BURGER_MAP_WIDTH];
             DrawTextureRec(
                 globalPackage->textures[TB_TEXTURE_TYPE_TILE],
-                (Rectangle){8 * v, 0, TINY_BURGER_TILE, TINY_BURGER_TILE},
+                (Rectangle){TINY_BURGER_TILE * v, 0, TINY_BURGER_TILE, TINY_BURGER_TILE},
                 position,
                 RAYWHITE);
 

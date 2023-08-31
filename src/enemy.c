@@ -219,7 +219,7 @@ TINY_BURGER static void __linear_interpolation(Enemy_t *const enemy)
             enemy->isInterpolation = true;
             enemy->position.x = enemy->position.x + (position.x - enemy->position.x) * enemy->interpolationValue;
             enemy->position.y = enemy->position.y + (position.y - enemy->position.y) * enemy->interpolationValue;
-            enemy->interpolationValue += 0.06f;
+            enemy->interpolationValue += 0.08f;
         }
     }
 }

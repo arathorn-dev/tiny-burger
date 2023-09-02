@@ -293,11 +293,45 @@ TINY_BURGER static void __init_hamburger(void)
 
 TINY_BURGER static void __load_hamburger(void)
 {
-    _hamburger[0] = create_hamburger();
+    _hamburger[0] = create_hamburger((Rectangle){
+        TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        10 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, 1});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){1, 3});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){1, 6});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){1, 8});
+
+    _hamburger[1] = create_hamburger((Rectangle){
+        5 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){5, 4});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){5, 6});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){5, 8});
+
+    _hamburger[2] = create_hamburger((Rectangle){
+        9 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){9, 1});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){9, 6});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){9, 8});
+
+    _hamburger[3] = create_hamburger((Rectangle){
+        13 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){13, 1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){13, 3});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){13, 5});
 }
 
 TINY_BURGER static void __update_hamburger(void)
@@ -305,7 +339,7 @@ TINY_BURGER static void __update_hamburger(void)
     for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
     {
         if (_hamburger[i] != NULL)
-            update_hamburger(_hamburger[i]);
+            update_hamburger(_hamburger[i], get_collision_shape_player(_player));
     }
 }
 TINY_BURGER static void __draw_hamburger(void)

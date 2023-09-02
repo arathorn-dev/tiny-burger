@@ -17,7 +17,7 @@ extern "C"
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
-TINY_BURGER Hamburger_t *create_hamburger(void)
+TINY_BURGER Hamburger_t *create_hamburger(Rectangle collisionShape)
 {
     Hamburger_t *hamburger = (Hamburger_t *)MemAlloc(sizeof(Hamburger_t));
     if (hamburger == NULL)
@@ -27,6 +27,8 @@ TINY_BURGER Hamburger_t *create_hamburger(void)
     }
 
     __init_ingredient_vector(hamburger);
+    hamburger->collisionShape = collisionShape;
+    hamburger->isCollision = false;
 
     return hamburger;
 }
@@ -39,9 +41,11 @@ TINY_BURGER void add_hamburger(Hamburger_t *const hamburger, IngredientType_u ty
     }
 }
 
-TINY_BURGER void update_hamburger(Hamburger_t *const hamburger)
+TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collisionShape)
 {
-    // TODO
+    hamburger->isCollision = CheckCollisionRecs(
+        hamburger->collisionShape,
+        collisionShape);
 }
 
 TINY_BURGER void draw_hamburger(const Hamburger_t *const hamburger)

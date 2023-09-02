@@ -35,6 +35,8 @@ extern "C"
     TINY_BURGER static void __reset_interpolation(Player_t *const player);
     TINY_BURGER static void __linear_interpolation(Player_t *const player);
 
+    TINY_BURGER static AnimationPlayer_t *__init_animation_player(void);
+
 #if defined(__cplusplus)
 }
 #endif
@@ -51,44 +53,20 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         return NULL;
     }
 
-    player->ap = create_animation_player(5);
+    player->ap = __init_animation_player();
     if (player->ap == NULL)
     {
         MemFree(player);
         player = NULL;
         return player;
     }
-    Rectangle idle[] = {
-        (Rectangle){0, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle run[] = {
-        (Rectangle){2 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){3 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle idleStair[] = {
-        (Rectangle){4 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle idleStairUp[] = {
-        (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    Rectangle runUp[] = {
-        (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-        (Rectangle){6 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
-    };
-
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE, idle, 2);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN, run, 2);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
-    add_frames_animation_player(player->ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
-    set_animation_player(player->ap, PLAYER_ANIMATION_IDLE_STAIR);
 
     player->position = position;
+    player->collisionShape = (Rectangle){
+        position.x * TINY_BURGER_TILE,
+        position.y * TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+        TINY_BURGER_TILE};
     player->isInterpolation = false;
     TraceLog(LOG_DEBUG, "Player_t pointer created successfully.");
     return player;
@@ -122,6 +100,16 @@ TINY_BURGER void destroy_player(Player_t **ptr)
         (*ptr) = NULL;
         TraceLog(LOG_DEBUG, "App_t pointer destroyed successfully.");
     }
+}
+
+TINY_BURGER Rectangle get_collision_shape_player(const Player_t *const player)
+{
+    return (Rectangle){
+        player->position.x * TINY_BURGER_TILE,
+        player->position.y * TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+    };
 }
 
 //----------------------------------------------------------------------------------
@@ -227,4 +215,43 @@ TINY_BURGER static void __linear_interpolation(Player_t *const player)
         player->position.y = player->position.y + (_interpolationPosition.y - player->position.y) * _interpolationValue;
         _interpolationValue += 0.1f;
     }
+}
+
+TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
+{
+    AnimationPlayer_t *ap = create_animation_player(5);
+    if (ap != NULL)
+    {
+        Rectangle idle[] = {
+            (Rectangle){0, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle run[] = {
+            (Rectangle){2 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){3 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle idleStair[] = {
+            (Rectangle){4 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle idleStairUp[] = {
+            (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        Rectangle runUp[] = {
+            (Rectangle){5 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){6 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
+        add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE, idle, 2);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_RUN, run, 2);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
+        set_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR);
+    }
+
+    return ap;
 }

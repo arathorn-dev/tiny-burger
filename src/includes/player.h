@@ -9,6 +9,7 @@ TINY_BURGER typedef struct
     Vector2 position;
     AnimationPlayer_t *ap;
     bool isInterpolation;
+    Rectangle collisionShape;
 } Player_t;
 
 #if defined(__cplusplus)
@@ -20,6 +21,7 @@ extern "C"
     TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector);
     TINY_BURGER void draw_player(const Player_t *const player);
     TINY_BURGER void destroy_player(Player_t **ptr);
+    TINY_BURGER Rectangle get_collision_shape_player(const Player_t *const player);
 
 #if defined(__cplusplus)
 }

@@ -1,6 +1,11 @@
 #include "includes/hamburger.h"
 
 //----------------------------------------------------------------------------------
+// Global.
+//----------------------------------------------------------------------------------
+extern bool globalIsCollisionDebug;
+
+//----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
 #if defined(__cplusplus)
@@ -51,6 +56,12 @@ TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collis
 TINY_BURGER void draw_hamburger(const Hamburger_t *const hamburger)
 {
     __draw_ingredient_vector(hamburger);
+    if (globalIsCollisionDebug)
+    {
+        DrawRectangleRec(
+            hamburger->collisionShape,
+            (hamburger->isCollision) ? GREEN : GRAY);
+    }
 }
 
 TINY_BURGER void destroy_hamburger(Hamburger_t **ptr)

@@ -5,6 +5,7 @@
 // Global Definition.
 //----------------------------------------------------------------------------------
 Package_t *globalPackage = NULL;
+bool globalIsCollisionDebug = false;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
@@ -152,6 +153,12 @@ TINY_BURGER static void __update_window(App_t *app)
         {
             __update_transition(app);
         }
+    }
+
+    // TODO: Delete this.
+    if (IsKeyPressed(KEY_F9))
+    {
+        globalIsCollisionDebug = !globalIsCollisionDebug;
     }
 }
 

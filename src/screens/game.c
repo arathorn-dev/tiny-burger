@@ -9,6 +9,7 @@
 // Global.
 //----------------------------------------------------------------------------------
 extern Package_t *globalPackage;
+extern bool globalIsCollisionDebug;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
@@ -17,8 +18,6 @@ extern Package_t *globalPackage;
 TINY_BURGER static int32_t *_vectorDraw = NULL;
 TINY_BURGER static int32_t *_vectorPath = NULL;
 TINY_BURGER static int32_t _currentLevel = -1;
-
-TINY_BURGER static bool _showPath = false;
 
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
@@ -36,10 +35,17 @@ extern "C"
     TINY_BURGER static Vector2 __get_position_enemy(int32_t level);
 
     TINY_BURGER static void __init_hamburger(void);
-    TINY_BURGER static void __load_hamburger(void);
+    TINY_BURGER static void __load_hamburger(int32_t level);
     TINY_BURGER static void __update_hamburger(void);
     TINY_BURGER static void __draw_hamburger(void);
     TINY_BURGER static void __unload_hamburger(void);
+
+    TINY_BURGER static void __loadl_level0(void);
+    TINY_BURGER static void __loadl_level1(void);
+    TINY_BURGER static void __loadl_level2(void);
+    TINY_BURGER static void __loadl_level3(void);
+    TINY_BURGER static void __loadl_level4(void);
+    TINY_BURGER static void __loadl_level5(void);
 
 #if defined(__cplusplus)
 }
@@ -74,9 +80,6 @@ TINY_BURGER Screen_t *create_game(void)
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
 
-    __init_hamburger();
-    __load_hamburger();
-
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
 }
@@ -87,10 +90,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
     {
         screen->nextScreenType = TB_SCREEN_TYPE_MENU;
     }
-    else if (IsKeyPressed(KEY_F9))
-    {
-        _showPath = !_showPath;
-    }
+
     else if (IsKeyPressed(KEY_F1))
         __load_level(0);
     else if (IsKeyPressed(KEY_F2))
@@ -134,9 +134,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
         _vectorDraw = NULL;
         _vectorPath = NULL;
         _player = NULL;
-
         _currentLevel = -1;
-        _showPath = false;
 
         MemFree((*ptr));
         (*ptr) = NULL;
@@ -162,7 +160,7 @@ TINY_BURGER static void __draw_map(void)
                 position,
                 RAYWHITE);
 
-            if (_showPath)
+            if (globalIsCollisionDebug)
             {
                 v = _vectorPath[j + i * TINY_BURGER_MAP_WIDTH];
                 if (v > 0)
@@ -188,7 +186,6 @@ TINY_BURGER static bool __load_level(int32_t level)
     if (_currentLevel != level)
     {
         __unload_hamburger();
-        __load_hamburger();
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
         destroy_player(&_player);
@@ -201,6 +198,8 @@ TINY_BURGER static bool __load_level(int32_t level)
             _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
             // _enemy = create_enemy(TB_ENEMY_TYPE_EGG, __get_position_enemy(level)); // TODO: Remove this.
             __init_hamburger();
+            __load_hamburger(level);
+
             _currentLevel = level;
             isLoaded = true;
         }
@@ -291,7 +290,61 @@ TINY_BURGER static void __init_hamburger(void)
         _hamburger[i] = NULL;
 }
 
-TINY_BURGER static void __load_hamburger(void)
+TINY_BURGER static void __load_hamburger(int32_t level)
+{
+    switch (level)
+    {
+    case 0:
+        __loadl_level0();
+        break;
+    case 1:
+        __loadl_level1();
+        break;
+    case 2:
+        __loadl_level2();
+        break;
+    case 3:
+        __loadl_level3();
+        break;
+    case 4:
+        __loadl_level4();
+        break;
+    case 5:
+        __loadl_level5();
+        break;
+    }
+}
+
+TINY_BURGER static void __update_hamburger(void)
+{
+    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+    {
+        if (_hamburger[i] != NULL)
+            update_hamburger(_hamburger[i], get_collision_shape_player(_player));
+    }
+}
+TINY_BURGER static void __draw_hamburger(void)
+{
+    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+    {
+        if (_hamburger[i] != NULL)
+            draw_hamburger(_hamburger[i]);
+    }
+}
+
+TINY_BURGER static void __unload_hamburger(void)
+{
+    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+    {
+        if (_hamburger[i] != NULL)
+        {
+            destroy_hamburger(&_hamburger[i]);
+            _hamburger[i] = NULL;
+        }
+    }
+}
+
+TINY_BURGER static void __loadl_level0(void)
 {
     _hamburger[0] = create_hamburger((Rectangle){
         TINY_BURGER_TILE,
@@ -334,31 +387,118 @@ TINY_BURGER static void __load_hamburger(void)
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){13, 5});
 }
 
-TINY_BURGER static void __update_hamburger(void)
+TINY_BURGER static void __loadl_level1(void)
 {
-    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
-    {
-        if (_hamburger[i] != NULL)
-            update_hamburger(_hamburger[i], get_collision_shape_player(_player));
-    }
-}
-TINY_BURGER static void __draw_hamburger(void)
-{
-    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
-    {
-        if (_hamburger[i] != NULL)
-            draw_hamburger(_hamburger[i]);
-    }
+    _hamburger[0] = create_hamburger((Rectangle){
+        TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        10 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, -1});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){1, 0});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){1, 1});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){1, 3});
+
+    _hamburger[1] = create_hamburger((Rectangle){
+        5 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){5, 1});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){5, 2});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){5, 7});
+
+    _hamburger[2] = create_hamburger((Rectangle){
+        9 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){9, 4});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){9, 6});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){9, 7});
+
+    _hamburger[3] = create_hamburger((Rectangle){
+        13 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        12 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){13, 1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){13, 2});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_DOWN, 3, (Vector2){13, 3});
 }
 
-TINY_BURGER static void __unload_hamburger(void)
+TINY_BURGER static void __loadl_level2(void)
 {
-    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
-    {
-        if (_hamburger[i] != NULL)
-        {
-            destroy_hamburger(&_hamburger[i]);
-            _hamburger[i] = NULL;
-        }
-    }
+    _hamburger[0] = create_hamburger((Rectangle){
+        TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        4 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, -1});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){1, 1});
+    add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){1, 2});
+
+    _hamburger[1] = create_hamburger((Rectangle){
+        5 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        7 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){5, 0});
+    add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){5, 2});
+
+    _hamburger[2] = create_hamburger((Rectangle){
+        9 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        7 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){9, 0});
+    add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){9, 2});
+
+    _hamburger[3] = create_hamburger((Rectangle){
+        13 * TINY_BURGER_TILE,
+        -1 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        4 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){13, 1});
+    add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){13, 2});
+
+    // ---
+    _hamburger[4] = create_hamburger((Rectangle){
+        TINY_BURGER_TILE,
+        6 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        4 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, 6});
+    add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){1, 7});
+    add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){1, 8});
+
+    _hamburger[5] = create_hamburger((Rectangle){
+        13 * TINY_BURGER_TILE,
+        6 * TINY_BURGER_TILE,
+        3 * TINY_BURGER_TILE,
+        4 * TINY_BURGER_TILE});
+    add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, 6});
+    add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){13, 7});
+    add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){13, 8});
+}
+
+TINY_BURGER static void __loadl_level3(void)
+{
+    // TODO
+}
+
+TINY_BURGER static void __loadl_level4(void)
+{
+    // TODO
+}
+
+TINY_BURGER static void __loadl_level5(void)
+{
+    // TODO
 }

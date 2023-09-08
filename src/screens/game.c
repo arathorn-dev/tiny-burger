@@ -246,9 +246,7 @@ TINY_BURGER static Vector2 __get_position_player(int32_t level)
         position = (Vector2){8, 6};
         break;
     case 4:
-        // position = (Vector2){12, 10};
-        // position = (Vector2){13, -1};
-        position = (Vector2){10, 1};
+        position = (Vector2){12, 10};
         break;
     case 5:
         position = (Vector2){8, 8};
@@ -350,7 +348,7 @@ TINY_BURGER static void __loadl_level0(void)
         TINY_BURGER_TILE,
         TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        10 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, 1});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){1, 3});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){1, 6});
@@ -358,9 +356,9 @@ TINY_BURGER static void __loadl_level0(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        10 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){5, 4});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){5, 6});
@@ -368,9 +366,9 @@ TINY_BURGER static void __loadl_level0(void)
 
     _hamburger[2] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        10 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){9, 1});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){9, 6});
@@ -378,9 +376,9 @@ TINY_BURGER static void __loadl_level0(void)
 
     _hamburger[3] = create_hamburger((Rectangle){
         13 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        10 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){13, 1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){13, 3});
@@ -391,9 +389,9 @@ TINY_BURGER static void __loadl_level1(void)
 {
     _hamburger[0] = create_hamburger((Rectangle){
         TINY_BURGER_TILE,
-        TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        10 * TINY_BURGER_TILE});
+        5 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, -1});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){1, 0});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){1, 1});
@@ -401,9 +399,9 @@ TINY_BURGER static void __loadl_level1(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){5, 1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){5, 2});
@@ -411,9 +409,9 @@ TINY_BURGER static void __loadl_level1(void)
 
     _hamburger[2] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){9, 4});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){9, 6});
@@ -421,9 +419,9 @@ TINY_BURGER static void __loadl_level1(void)
 
     _hamburger[3] = create_hamburger((Rectangle){
         13 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        5 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_SALAD, 1, (Vector2){13, 1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){13, 2});
@@ -443,25 +441,25 @@ TINY_BURGER static void __loadl_level2(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        7 * TINY_BURGER_TILE});
+        6 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){5, 0});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){5, 2});
 
     _hamburger[2] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        7 * TINY_BURGER_TILE});
+        6 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){9, 0});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){9, 2});
 
     _hamburger[3] = create_hamburger((Rectangle){
         13 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
         4 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
@@ -473,7 +471,7 @@ TINY_BURGER static void __loadl_level2(void)
         TINY_BURGER_TILE,
         6 * TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        4 * TINY_BURGER_TILE});
+        3 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, 6});
     add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){1, 7});
     add_hamburger(_hamburger[4], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){1, 8});
@@ -482,7 +480,7 @@ TINY_BURGER static void __loadl_level2(void)
         13 * TINY_BURGER_TILE,
         6 * TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        4 * TINY_BURGER_TILE});
+        3 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, 6});
     add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){13, 7});
     add_hamburger(_hamburger[5], TINY_BURGER_INGREDIENT_BREAD_DOWN, 2, (Vector2){13, 8});
@@ -492,9 +490,9 @@ TINY_BURGER static void __loadl_level3(void)
 {
     _hamburger[0] = create_hamburger((Rectangle){
         TINY_BURGER_TILE,
-        TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        10 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, -1});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_TOMATO, 1, (Vector2){1, 0});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){1, 1});
@@ -506,9 +504,9 @@ TINY_BURGER static void __loadl_level3(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_TOMATO, 1, (Vector2){5, 0});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){5, 1});
@@ -520,9 +518,9 @@ TINY_BURGER static void __loadl_level3(void)
 
     _hamburger[2] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_TOMATO, 1, (Vector2){9, 0});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){9, 1});
@@ -534,9 +532,9 @@ TINY_BURGER static void __loadl_level3(void)
 
     _hamburger[3] = create_hamburger((Rectangle){
         13 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_TOMATO, 1, (Vector2){13, 0});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){13, 1});
@@ -551,9 +549,9 @@ TINY_BURGER static void __loadl_level4(void)
 {
     _hamburger[0] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){5, 0});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_TOMATO, 2, (Vector2){5, 1});
@@ -565,9 +563,9 @@ TINY_BURGER static void __loadl_level4(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        8 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){9, 0});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_TOMATO, 2, (Vector2){9, 1});
@@ -582,9 +580,9 @@ TINY_BURGER static void __loadl_level5(void)
 {
     _hamburger[0] = create_hamburger((Rectangle){
         TINY_BURGER_TILE,
-        TINY_BURGER_TILE,
+        0,
         3 * TINY_BURGER_TILE,
-        10 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){1, 0});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){1, 2});
     add_hamburger(_hamburger[0], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){1, 4});
@@ -592,9 +590,9 @@ TINY_BURGER static void __loadl_level5(void)
 
     _hamburger[1] = create_hamburger((Rectangle){
         5 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){5, -1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_CHEESE, 1, (Vector2){5, 1});
     add_hamburger(_hamburger[1], TINY_BURGER_INGREDIENT_MEAT, 2, (Vector2){5, 3});
@@ -603,9 +601,9 @@ TINY_BURGER static void __loadl_level5(void)
 
     _hamburger[2] = create_hamburger((Rectangle){
         9 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){9, 0});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_TOMATO, 1, (Vector2){9, 2});
     add_hamburger(_hamburger[2], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){9, 4});
@@ -614,9 +612,9 @@ TINY_BURGER static void __loadl_level5(void)
 
     _hamburger[3] = create_hamburger((Rectangle){
         13 * TINY_BURGER_TILE,
-        -1 * TINY_BURGER_TILE,
+        -TINY_BURGER_TILE,
         3 * TINY_BURGER_TILE,
-        12 * TINY_BURGER_TILE});
+        9 * TINY_BURGER_TILE});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_BREAD_UP, 0, (Vector2){13, -1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_MEAT, 1, (Vector2){13, 1});
     add_hamburger(_hamburger[3], TINY_BURGER_INGREDIENT_CHEESE, 2, (Vector2){13, 5});

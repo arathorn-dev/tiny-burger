@@ -62,42 +62,43 @@ TINY_BURGER void destroy_ingredient(Ingredient_t **ptr)
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __init_ingredient(Ingredient_t *const ingredient)
 {
+    int32_t diff = 2;
     switch (ingredient->type)
     {
     case TINY_BURGER_INGREDIENT_BREAD_UP:
         ingredient->rect[0] = (Rectangle){
             0,
-            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            5 * TINY_BURGER_TILE + (TINY_BURGER_TILE / 2),
             TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            (TINY_BURGER_TILE / 2)};
         ingredient->rect[1] = (Rectangle){
             0,
             5 * TINY_BURGER_TILE,
             TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            (TINY_BURGER_TILE / 2)};
         ingredient->rect[2] = (Rectangle){
             0,
-            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            5 * TINY_BURGER_TILE + (TINY_BURGER_TILE / 2),
             -TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            (TINY_BURGER_TILE / 2)};
         break;
 
     case TINY_BURGER_INGREDIENT_BREAD_DOWN:
         ingredient->rect[0] = (Rectangle){
             0,
-            5 * TINY_BURGER_TILE,
+            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
             TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            -TINY_BURGER_TILE / 2};
         ingredient->rect[1] = (Rectangle){
             0,
             5 * TINY_BURGER_TILE,
             TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            -TINY_BURGER_TILE / 2};
         ingredient->rect[2] = (Rectangle){
             0,
-            5 * TINY_BURGER_TILE,
-            TINY_BURGER_TILE,
-            TINY_BURGER_TILE / 2};
+            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            -TINY_BURGER_TILE,
+            -TINY_BURGER_TILE / 2};
         break;
     case TINY_BURGER_INGREDIENT_CHEESE:
         ingredient->rect[0] = (Rectangle){
@@ -143,13 +144,30 @@ TINY_BURGER static void __init_ingredient(Ingredient_t *const ingredient)
             TINY_BURGER_TILE / 2};
         ingredient->rect[1] = (Rectangle){
             3 * TINY_BURGER_TILE,
-            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            5 * TINY_BURGER_TILE,
             TINY_BURGER_TILE,
             TINY_BURGER_TILE / 2};
         ingredient->rect[2] = (Rectangle){
             3 * TINY_BURGER_TILE,
             5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            -TINY_BURGER_TILE,
+            TINY_BURGER_TILE / 2};
+        break;
+    case TINY_BURGER_INGREDIENT_TOMATO:
+        ingredient->rect[0] = (Rectangle){
+            4 * TINY_BURGER_TILE,
+            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
             TINY_BURGER_TILE,
+            TINY_BURGER_TILE / 2};
+        ingredient->rect[1] = (Rectangle){
+            4 * TINY_BURGER_TILE,
+            5 * TINY_BURGER_TILE,
+            TINY_BURGER_TILE,
+            TINY_BURGER_TILE / 2};
+        ingredient->rect[2] = (Rectangle){
+            4 * TINY_BURGER_TILE,
+            5 * TINY_BURGER_TILE + TINY_BURGER_TILE / 2,
+            -TINY_BURGER_TILE,
             TINY_BURGER_TILE / 2};
         break;
     }

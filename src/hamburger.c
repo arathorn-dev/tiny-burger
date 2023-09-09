@@ -13,7 +13,7 @@ extern "C"
 {
 #endif
     TINY_BURGER static void __init_ingredient_vector(Hamburger_t *const hamburger);
-    TINY_BURGER static void __update_ingredient_vector(Hamburger_t *const hamburger);
+    TINY_BURGER static void __update_ingredient_vector(Hamburger_t *const hamburger, Rectangle collisionShape);
     TINY_BURGER static void __draw_ingredient_vector(const Hamburger_t *const hamburger);
     TINY_BURGER static void __destroy_ingredient_vector(Hamburger_t *const hamburger);
 #if defined(__cplusplus)
@@ -51,6 +51,7 @@ TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collis
     hamburger->isCollision = CheckCollisionRecs(
         hamburger->collisionShape,
         collisionShape);
+    __update_ingredient_vector(hamburger, collisionShape);
 }
 
 TINY_BURGER void draw_hamburger(const Hamburger_t *const hamburger)
@@ -84,13 +85,13 @@ TINY_BURGER static void __init_ingredient_vector(Hamburger_t *const hamburger)
         hamburger->ingredient[i] = NULL;
 }
 
-TINY_BURGER static void __update_ingredient_vector(Hamburger_t *const hamburger)
+TINY_BURGER static void __update_ingredient_vector(Hamburger_t *const hamburger, Rectangle collisionShape)
 {
     for (uint32_t i = 0; i < TINY_BURGER_MAX_INGREDIENT_SIZE; ++i)
     {
         if (hamburger->ingredient[i] != NULL)
         {
-            update_ingredient(hamburger->ingredient[i]);
+            update_ingredient(hamburger->ingredient[i], collisionShape, hamburger->isCollision);
         }
     }
 }

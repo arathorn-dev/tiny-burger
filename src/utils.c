@@ -83,8 +83,7 @@ TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, uint32_t 
         int32_t rowsCount = 0;
         const char **tmpRowsText = TextSplit(data, '\n', &rowsCount);
         char **rowsText = __copy_text(tmpRowsText, rowsCount - 1);
-
-        for (uint32_t i = 0; i < rowsCount; ++i)
+        for (uint32_t i = 0; i < (rowsCount - 1); ++i)
         {
             int32_t columnCount = 0;
             const char **columnsText = TextSplit(rowsText[i], ',', &columnCount);
@@ -99,7 +98,6 @@ TINY_BURGER static int32_t *__create_draw_vector(const char *fileName, uint32_t 
                 vector[j + i * width] = value;
             }
         }
-
         __destroy_copy_text(&rowsText, rowsCount - 1);
         UnloadFileText(data);
         TraceLog(LOG_INFO, "File has been closed successfully.");

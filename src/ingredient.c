@@ -309,7 +309,6 @@ TINY_BURGER static void __linear_interpolation(Ingredient_t *const ingredient, V
     ingredient->time += 0.05f;
     if (ingredient->time > 1)
     {
-        TraceLog(LOG_INFO, "STOPPING!!");
         set_segment_check_ingredient(ingredient, false);
         ingredient->position = position;
         ingredient->isCollision = false;

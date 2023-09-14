@@ -280,7 +280,7 @@ TINY_BURGER static void __check_collision_ingredient_segment(Ingredient_t *const
                 if (CheckCollisionRecs(shape, collisionShape))
                 {
                     ingredient->segment[i].check = true;
-                    ingredient->segment[i].position.y += 8;
+                    ingredient->segment[i].position.y += 4;
                     break;
                 }
             }
@@ -306,6 +306,12 @@ TINY_BURGER static void __linear_interpolation(Ingredient_t *const ingredient, V
         ingredient->segment[i].position.x = cp.x + (np.x - cp.x) * ingredient->time;
         ingredient->segment[i].position.y = cp.y + (np.y - cp.y) * ingredient->time;
     }
+    // --
+    Vector2 cp = ingredient->position;
+    Vector2 np = position;
+    ingredient->position.x = cp.x + (np.x - cp.x) * ingredient->time;
+    ingredient->position.y = cp.y + (np.y - cp.y) * ingredient->time;
+    // --
     ingredient->time += 0.05f;
     if (ingredient->time > 1)
     {

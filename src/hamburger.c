@@ -102,7 +102,8 @@ TINY_BURGER static void __update_ingredient(Hamburger_t *const hamburger, Rectan
             if (is_completed_ingredient(hamburger->ingredient[i]))
             {
                 uint32_t pathIndex = get_path_index_ingredient(hamburger->ingredient[i]);
-                transition_ingredient(hamburger->ingredient[i], hamburger->path->vector[pathIndex], pathIndex == (hamburger->path->size - 1));
+                bool isLast = pathIndex == (hamburger->path->size - 1);
+                transition_ingredient(hamburger->ingredient[i], hamburger->path->vector[pathIndex], isLast);
                 // ---
                 if ((i + 1) < TINY_BURGER_MAX_INGREDIENT_SIZE && hamburger->ingredient[i + 1] != NULL)
                 {

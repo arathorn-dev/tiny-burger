@@ -19,6 +19,10 @@ TINY_BURGER static int32_t *_vectorDraw = NULL;
 TINY_BURGER static int32_t *_vectorPath = NULL;
 TINY_BURGER static int32_t _currentLevel = -1;
 
+TINY_BURGER static bool _isHamburgerCompletedByIndex[TINY_BURGER_MAX_HAMBURGER_SIZE];
+TINY_BURGER static uint32_t _maxHamburger = 0;
+TINY_BURGER static uint32_t _countHamburger = 0;
+
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
 // TINY_BURGER static Enemy_t *_enemy = NULL;
@@ -110,7 +114,8 @@ TINY_BURGER void update_game(Screen_t *const screen)
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
-    DrawFPS(0, 0);
+    // DrawFPS(0, 0);
+    DrawText(TextFormat("%d", _countHamburger), 0, 0, 24, RAYWHITE);
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();
@@ -135,6 +140,11 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
         _vectorPath = NULL;
         _player = NULL;
         _currentLevel = -1;
+
+        for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+            _isHamburgerCompletedByIndex[i] = false;
+        _maxHamburger = 0;
+        _countHamburger = 0;
 
         MemFree((*ptr));
         (*ptr) = NULL;
@@ -190,6 +200,8 @@ TINY_BURGER static bool __load_level(int32_t level)
         unload_path_map(&_vectorPath);
         destroy_player(&_player);
         // destroy_enemy(&_enemy);
+        _maxHamburger = 0;
+        _countHamburger = 0;
         _player = create_player(__get_position_player(level));
         if (_player != NULL)
         {
@@ -202,6 +214,8 @@ TINY_BURGER static bool __load_level(int32_t level)
 
             _currentLevel = level;
             isLoaded = true;
+            for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+                _isHamburgerCompletedByIndex[i] = false;
         }
     }
     return isLoaded;
@@ -318,7 +332,14 @@ TINY_BURGER static void __update_hamburger(void)
     for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
     {
         if (_hamburger[i] != NULL)
+        {
             update_hamburger(_hamburger[i], get_collision_shape_player(_player));
+            if (!_isHamburgerCompletedByIndex[i] && is_completed_hamburger(_hamburger[i]))
+            {
+                _isHamburgerCompletedByIndex[i] = true;
+                ++_countHamburger;
+            }
+        }
     }
 }
 TINY_BURGER static void __draw_hamburger(void)
@@ -344,6 +365,7 @@ TINY_BURGER static void __unload_hamburger(void)
 
 TINY_BURGER static void __loadl_level0(void)
 {
+    _maxHamburger = 4;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 6;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);
@@ -427,6 +449,7 @@ TINY_BURGER static void __loadl_level0(void)
 
 TINY_BURGER static void __loadl_level1(void)
 {
+    _maxHamburger = 4;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 5;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);
@@ -510,6 +533,7 @@ TINY_BURGER static void __loadl_level1(void)
 
 TINY_BURGER static void __loadl_level2(void)
 {
+    _maxHamburger = 6;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 5;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);
@@ -622,6 +646,7 @@ TINY_BURGER static void __loadl_level2(void)
 
 TINY_BURGER static void __loadl_level3(void)
 {
+    _maxHamburger = 4;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 9;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);
@@ -733,6 +758,7 @@ TINY_BURGER static void __loadl_level3(void)
 
 TINY_BURGER static void __loadl_level4(void)
 {
+    _maxHamburger = 2;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 9;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);
@@ -790,6 +816,7 @@ TINY_BURGER static void __loadl_level4(void)
 
 TINY_BURGER static void __loadl_level5(void)
 {
+    _maxHamburger = 4;
     IngredientPath_t *path0 = (IngredientPath_t *)MemAlloc(sizeof(IngredientPath_t));
     path0->size = 6;
     path0->vector = (Vector2 *)MemAlloc(sizeof(Vector2) * path0->size);

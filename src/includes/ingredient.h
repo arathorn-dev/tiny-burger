@@ -27,6 +27,7 @@ TINY_BURGER typedef struct
     uint32_t pathIndex;
     uint32_t index;
     bool isCollision;
+    bool isCompleted;
     float time;
 } Ingredient_t;
 
@@ -40,6 +41,7 @@ extern "C"
     TINY_BURGER void check_collision_ingredient(Ingredient_t *const ingredient, Rectangle collisionShape, bool isCollisionShape);
     TINY_BURGER void transition_ingredient(Ingredient_t *const ingredient, Vector2 position, bool isLast);
     TINY_BURGER void draw_ingredient(const Ingredient_t *const ingredient);
+    TINY_BURGER bool is_check_ingredient(const Ingredient_t *const ingredient);
     TINY_BURGER bool is_completed_ingredient(const Ingredient_t *const ingredient);
     TINY_BURGER Rectangle get_collision_shape_ingredient(const Ingredient_t *const ingredient);
     TINY_BURGER uint32_t get_path_index_ingredient(const Ingredient_t *const ingredient);

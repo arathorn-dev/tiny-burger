@@ -52,6 +52,11 @@ TINY_BURGER void add_hamburger(Hamburger_t *const hamburger, IngredientType_u ty
     }
 }
 
+TINY_BURGER bool is_completed_hamburger(const Hamburger_t *const hamburger)
+{
+    return hamburger->ingredient[0]->isCompleted;
+}
+
 TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collisionShape)
 {
     hamburger->isCollision = CheckCollisionRecs(
@@ -64,12 +69,12 @@ TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collis
 TINY_BURGER void draw_hamburger(const Hamburger_t *const hamburger)
 {
     __draw_ingredient(hamburger);
-    // if (globalIsCollisionDebug)
-    // {
-    //     DrawRectangleRec(
-    //         hamburger->collisionShape,
-    //         (hamburger->isCollision) ? GREEN : GRAY);
-    // }
+    if (globalIsCollisionDebug && !is_completed_ingredient(hamburger->ingredient[0]))
+    {
+        DrawRectangleRec(
+            hamburger->collisionShape,
+            (hamburger->isCollision) ? GREEN : GRAY);
+    }
 }
 
 TINY_BURGER void destroy_hamburger(Hamburger_t **ptr)
@@ -99,12 +104,11 @@ TINY_BURGER static void __update_ingredient(Hamburger_t *const hamburger, Rectan
     {
         if (hamburger->ingredient[i] != NULL)
         {
-            if (is_completed_ingredient(hamburger->ingredient[i]))
+            if (is_check_ingredient(hamburger->ingredient[i]))
             {
                 uint32_t pathIndex = get_path_index_ingredient(hamburger->ingredient[i]);
                 bool isLast = pathIndex == (hamburger->path->size - 1);
                 transition_ingredient(hamburger->ingredient[i], hamburger->path->vector[pathIndex], isLast);
-                // ---
                 if ((i + 1) < TINY_BURGER_MAX_INGREDIENT_SIZE && hamburger->ingredient[i + 1] != NULL)
                 {
                     uint32_t nextPathIndex = get_path_index_ingredient(hamburger->ingredient[i + 1]);
@@ -119,9 +123,8 @@ TINY_BURGER static void __update_ingredient(Hamburger_t *const hamburger, Rectan
                         }
                     }
                 }
-                // ---
             }
-            else
+            else if (!is_completed_ingredient(hamburger->ingredient[0]))
             {
                 check_collision_ingredient(hamburger->ingredient[i], collisionShape, hamburger->isCollision);
             }

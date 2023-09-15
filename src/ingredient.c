@@ -39,6 +39,7 @@ TINY_BURGER Ingredient_t *create_ingredient(IngredientType_u type, Vector2 posit
     ingredient->position = position;
     ingredient->type = type;
     ingredient->isCollision = false;
+    ingredient->isCompleted = false;
     ingredient->time = 0.0f;
     ingredient->pathIndex = pathIndex;
     ingredient->index = index;
@@ -65,9 +66,14 @@ TINY_BURGER void draw_ingredient(const Ingredient_t *const ingredient)
     __draw_ingredient(ingredient);
 }
 
-TINY_BURGER bool is_completed_ingredient(const Ingredient_t *const ingredient)
+TINY_BURGER bool is_check_ingredient(const Ingredient_t *const ingredient)
 {
     return ingredient->segment[0].check && ingredient->segment[1].check && ingredient->segment[2].check;
+}
+
+TINY_BURGER bool is_completed_ingredient(const Ingredient_t *const ingredient)
+{
+    return ingredient->isCompleted;
 }
 
 TINY_BURGER Rectangle get_collision_shape_ingredient(const Ingredient_t *const ingredient)
@@ -318,6 +324,7 @@ TINY_BURGER static void __linear_interpolation(Ingredient_t *const ingredient, V
         set_segment_check_ingredient(ingredient, false);
         ingredient->position = position;
         ingredient->isCollision = false;
+        ingredient->isCompleted = isLast;
         ingredient->time = 0.0f;
     }
 }

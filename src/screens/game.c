@@ -4,6 +4,7 @@
 #include "../includes/player.h"
 #include "../includes/enemy.h"
 #include "../includes/hamburger.h"
+#include "../includes/gui.h"
 
 //----------------------------------------------------------------------------------
 // Global.
@@ -25,6 +26,7 @@ TINY_BURGER static uint32_t _countHamburger = 0;
 
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
+TINY_BURGER static Gui_t *_gui = NULL;
 // TINY_BURGER static Enemy_t *_enemy = NULL;
 TINY_BURGER static Hamburger_t *_hamburger[TINY_BURGER_MAX_HAMBURGER_SIZE];
 
@@ -83,6 +85,7 @@ TINY_BURGER Screen_t *create_game(void)
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
+    _gui = create_gui();
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
@@ -107,7 +110,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
         __load_level(4);
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
-
+    update_gui(_gui);
     __update_hamburger();
     update_player(_player, _vectorPath);
     // update_enemy(_enemy, _vectorPath, _player);
@@ -115,7 +118,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
     // DrawFPS(0, 0);
-    DrawText(TextFormat("%d", _countHamburger), 0, 0, 24, RAYWHITE);
+    draw_gui(_gui);
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();
@@ -129,6 +132,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        destroy_gui(&_gui);
         __unload_hamburger();
         destroy_player(&_player);
         // destroy_enemy(&_enemy);

@@ -32,6 +32,11 @@ TINY_BURGER static Gui_t *_gui = NULL;
 // TINY_BURGER static Enemy_t *_enemy = NULL;
 TINY_BURGER static Hamburger_t *_hamburger[TINY_BURGER_MAX_HAMBURGER_SIZE];
 
+TINY_BURGER static bool _isLoading = true;
+TINY_BURGER static uint32_t _fpsLoading = 0;
+TINY_BURGER static uint32_t _countLoading = 0;
+TINY_BURGER static uint32_t _maxLoading = 2;
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -43,6 +48,13 @@ extern "C"
     TINY_BURGER static Vector2 __get_position_enemy(int32_t level);
     TINY_BURGER static void __init_gui_data(void);
     TINY_BURGER static void __destroy_gui_data(void);
+
+    TINY_BURGER static void __reset_loading(void);
+    TINY_BURGER static void __draw_loading(void);
+    TINY_BURGER static void __update_loading(void);
+
+    TINY_BURGER static void __draw(const Screen_t *const screen);
+    TINY_BURGER static void __update(Screen_t *const screen);
 
     TINY_BURGER static void __init_hamburger(void);
     TINY_BURGER static void __load_hamburger(int32_t level);
@@ -72,7 +84,6 @@ TINY_BURGER Screen_t *create_game(void)
         TraceLog(LOG_DEBUG, "[GAME] Error to create a Screen_t pointer.");
         return NULL;
     }
-
     if (!__load_level(0))
     {
         MemFree(screen);
@@ -98,49 +109,18 @@ TINY_BURGER Screen_t *create_game(void)
 
 TINY_BURGER void update_game(Screen_t *const screen)
 {
-    if (IsKeyPressed(KEY_ESCAPE))
-    {
-        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
-    }
-
-    else if (IsKeyPressed(KEY_F1))
-        __load_level(0);
-    else if (IsKeyPressed(KEY_F2))
-        __load_level(1);
-    else if (IsKeyPressed(KEY_F3))
-        __load_level(2);
-    else if (IsKeyPressed(KEY_F4))
-        __load_level(3);
-    else if (IsKeyPressed(KEY_F5))
-        __load_level(4);
-    else if (IsKeyPressed(KEY_F6))
-        __load_level(5);
-
-    // ----
-    if (_countHamburger >= _maxHamburger && (_currentLevel + 1) < 6)
-    {
-        __load_level(_currentLevel + 1);
-    }
-
-    // ----
-
-    update_gui(_gui);
-    __update_hamburger();
-    update_player(_player, _vectorPath);
-    // update_enemy(_enemy, _vectorPath, _player);
+    if (_isLoading)
+        __update_loading();
+    else
+        __update(screen);
 }
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
-    // DrawFPS(0, 0);
-    // DrawText(TextFormat("%d", _countHamburger), 0, 24, 24, RAYWHITE);
-    draw_gui(_gui);
-    BeginMode2D(*_camera);
-    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
-    __draw_map();
-    draw_player(_player);
-    __draw_hamburger();
-    // draw_enemy(_enemy);
-    EndMode2D();
+
+    if (_isLoading)
+        __draw_loading();
+    else
+        __draw(screen);
 }
 
 TINY_BURGER void destroy_game(Screen_t **ptr)
@@ -215,6 +195,7 @@ TINY_BURGER static bool __load_level(int32_t level)
     bool isLoaded = false;
     if (_currentLevel != level)
     {
+        __reset_loading();
         __unload_hamburger();
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
@@ -328,6 +309,96 @@ TINY_BURGER static void __destroy_gui_data(void)
 {
     MemFree(globalGuiData);
     globalGuiData = NULL;
+}
+
+TINY_BURGER static void __reset_loading(void)
+{
+    _isLoading = true;
+    _fpsLoading = 0;
+    _countLoading = 0;
+}
+
+// TODO: Improve the function code.
+TINY_BURGER static void __draw_loading(void)
+{
+    DrawTextEx(
+        globalPackage->fonts[TB_FONT_TYPE_04B03],
+        "PLAYER 1",
+        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("PLAYER 1", 24) / 2, TINY_BURGER_HEIGHT / 2},
+        24,
+        1,
+        GetColor(TINY_BURGER_COLOR_5));
+
+    DrawTextEx(
+        globalPackage->fonts[TB_FONT_TYPE_04B03],
+        "READY",
+        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("READY", 24) / 2, TINY_BURGER_HEIGHT / 2 + 32},
+        24,
+        1,
+        GetColor(TINY_BURGER_COLOR_5));
+}
+
+TINY_BURGER static void __update_loading(void)
+{
+    if (_fpsLoading >= TINY_BURGER_FPS)
+    {
+        _countLoading++;
+        _fpsLoading = 0;
+    }
+    else
+        _fpsLoading++;
+
+    if (_countLoading > _maxLoading)
+    {
+        _isLoading = false;
+    }
+}
+
+TINY_BURGER static void __draw(const Screen_t *const screen)
+{
+    // DrawFPS(0, 0);
+    draw_gui(_gui);
+    BeginMode2D(*_camera);
+    DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
+    __draw_map();
+    draw_player(_player);
+    __draw_hamburger();
+    // draw_enemy(_enemy);
+    EndMode2D();
+}
+
+TINY_BURGER static void __update(Screen_t *const screen)
+{
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
+    }
+
+    else if (IsKeyPressed(KEY_F1))
+        __load_level(0);
+    else if (IsKeyPressed(KEY_F2))
+        __load_level(1);
+    else if (IsKeyPressed(KEY_F3))
+        __load_level(2);
+    else if (IsKeyPressed(KEY_F4))
+        __load_level(3);
+    else if (IsKeyPressed(KEY_F5))
+        __load_level(4);
+    else if (IsKeyPressed(KEY_F6))
+        __load_level(5);
+
+    // ----
+    if (_countHamburger >= _maxHamburger && (_currentLevel + 1) < 6)
+    {
+        __load_level(_currentLevel + 1);
+    }
+
+    // ----
+
+    update_gui(_gui);
+    __update_hamburger();
+    update_player(_player, _vectorPath);
+    // update_enemy(_enemy, _vectorPath, _player);
 }
 
 TINY_BURGER static void __init_hamburger(void)

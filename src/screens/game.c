@@ -115,6 +115,15 @@ TINY_BURGER void update_game(Screen_t *const screen)
         __load_level(4);
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
+
+    // ----
+    if (_countHamburger >= _maxHamburger && (_currentLevel + 1) < 6)
+    {
+        __load_level(_currentLevel + 1);
+    }
+
+    // ----
+
     update_gui(_gui);
     __update_hamburger();
     update_player(_player, _vectorPath);
@@ -123,6 +132,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
 TINY_BURGER void draw_game(const Screen_t *const screen)
 {
     // DrawFPS(0, 0);
+    // DrawText(TextFormat("%d", _countHamburger), 0, 24, 24, RAYWHITE);
     draw_gui(_gui);
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);

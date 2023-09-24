@@ -1,10 +1,12 @@
 #include "includes/ingredient.h"
 #include "includes/package.h"
+#include "includes/gui.h"
 
 //----------------------------------------------------------------------------------
 // Global.
 //----------------------------------------------------------------------------------
 extern Package_t *globalPackage;
+extern GuiData_t *globalGuiData;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
@@ -326,5 +328,6 @@ TINY_BURGER static void __linear_interpolation(Ingredient_t *const ingredient, V
         ingredient->isCollision = false;
         ingredient->isCompleted = isLast;
         ingredient->time = 0.0f;
+        globalGuiData->currentPoints += 50;
     }
 }

@@ -5,6 +5,7 @@
 // Global.
 //----------------------------------------------------------------------------------
 extern Package_t *globalPackage;
+extern GuiData_t *globalGuiData;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
@@ -38,6 +39,7 @@ TINY_BURGER Gui_t *create_gui(void)
     }
 
     gui->color = GetColor(TINY_BURGER_COLOR_15);
+    gui->labelColor = GetColor(TINY_BURGER_COLOR_3);
     __init_info(gui);
 
     return gui;
@@ -70,24 +72,18 @@ TINY_BURGER static void __init_info(Gui_t *const gui)
     // ----
     gui->info[0].position = (Vector2){0, 0};
     gui->info[0].hasImage = false;
-    gui->info[0].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[0].text, "000000");
     gui->info[0].label = MemAlloc(sizeof(char) * size);
     TextCopy(gui->info[0].label, "1UP");
 
     // ----
     gui->info[1].position = (Vector2){0, 0};
     gui->info[1].hasImage = false;
-    gui->info[1].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[1].text, "000000");
     gui->info[1].label = MemAlloc(sizeof(char) * size);
     TextCopy(gui->info[1].label, "HI");
 
     // ----
     gui->info[2].position = (Vector2){0, 0};
     gui->info[2].hasImage = true;
-    gui->info[2].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[2].text, "0");
     gui->info[2].imageRect = MemAlloc(sizeof(Rectangle));
     gui->info[2].imageRect->x = TINY_BURGER_TILE * 6;
     gui->info[2].imageRect->y = 0;
@@ -97,8 +93,6 @@ TINY_BURGER static void __init_info(Gui_t *const gui)
     // ----
     gui->info[3].position = (Vector2){0, 0};
     gui->info[3].hasImage = true;
-    gui->info[3].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[3].text, "0");
     gui->info[3].imageRect = MemAlloc(sizeof(Rectangle));
     gui->info[3].imageRect->x = TINY_BURGER_TILE * 6 + 8;
     gui->info[3].imageRect->y = 0;
@@ -133,16 +127,26 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
         {
             DrawTextEx(
                 globalPackage->fonts[TB_FONT_TYPE_04B03],
-                gui->info[i].label,
+                (i < 2) ? gui->info[i].label : TextFormat("%02d", (i == 2) ? globalGuiData->lives : globalGuiData->pepper),
                 position,
                 24,
                 1,
-                gui->color);
+                gui->labelColor);
         }
         position.x += (i > 1) ? 32 : 64;
+        uint32_t value = 0;
+        if (i == 0)
+            value = globalGuiData->maxPoints;
+        if (i == 1)
+            value = globalGuiData->currentPoints;
+        if (i == 2)
+            value = globalGuiData->pepper;
+        if (i == 3)
+            value = globalGuiData->lives;
+
         DrawTextEx(
             globalPackage->fonts[TB_FONT_TYPE_04B03],
-            gui->info[i].text,
+            TextFormat((i < 2) ? "%06d" : "%02d", value),
             position,
             24,
             1,
@@ -165,8 +169,5 @@ TINY_BURGER static void __destroy_info(Gui_t *const gui)
             MemFree(gui->info[i].label);
             gui->info[i].label = NULL;
         }
-
-        MemFree(gui->info[i].text);
-        gui->info[i].text = NULL;
     }
 }

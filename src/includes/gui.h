@@ -14,7 +14,6 @@ TINY_BURGER typedef struct
 TINY_BURGER typedef struct
 {
     Vector2 position;
-    char *text;
     bool hasImage;
     union
     {
@@ -27,6 +26,7 @@ TINY_BURGER typedef struct
 TINY_BURGER typedef struct
 {
     Color color;
+    Color labelColor;
     GuiInfo_t info[TINY_BURGER_INFO_GUI_SIZE];
 } Gui_t;
 

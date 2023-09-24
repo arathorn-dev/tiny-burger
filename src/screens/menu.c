@@ -13,9 +13,9 @@ extern Package_t *globalPackage;
 //----------------------------------------------------------------------------------
 
 static const char *_options[__MENU_SIZE] = {
-    "start",
-    "option",
-    "exit"};
+    "PLAYER",
+    "OPTION",
+    "EXIT"};
 static Vector2 _optionsPosition[__MENU_SIZE];
 static int32_t currentOption = 0;
 
@@ -61,6 +61,25 @@ TINY_BURGER void update_menu(Screen_t *const screen)
 TINY_BURGER void draw_menu(const Screen_t *const screen)
 {
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_0));
+    /// ----
+    DrawTexturePro(
+        globalPackage->textures[TB_TEXTURE_TYPE_TILE],
+        (Rectangle){
+            0,
+            TINY_BURGER_TILE * 6,
+            TINY_BURGER_TILE * 6,
+            TINY_BURGER_FONT_SIZE},
+        (Rectangle){
+            TINY_BURGER_WIDTH / 6.5,
+            TINY_BURGER_HEIGHT / 5,
+            TINY_BURGER_TILE * 6 * 5,
+            TINY_BURGER_FONT_SIZE * 5},
+        (Vector2){0},
+        0,
+        RAYWHITE);
+
+    /// ----
+
     __draw_options();
 }
 
@@ -84,7 +103,7 @@ TINY_BURGER static void __load_options(void)
     {
         Vector2 measure = MeasureTextEx(globalPackage->fonts[TB_FONT_TYPE_04B03], _options[i], TINY_BURGER_FONT_SIZE, 1.0);
         _optionsPosition[i] =
-            (Vector2){middle - (measure.x / 2), position.y + i * TINY_BURGER_FONT_SIZE};
+            (Vector2){middle - (measure.x / 2), position.y + i * 32};
     }
 }
 

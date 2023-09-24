@@ -117,8 +117,8 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
                 (Rectangle){
                     position.x,
                     position.y,
-                    24,
-                    24},
+                    TINY_BURGER_FONT_SIZE,
+                    TINY_BURGER_FONT_SIZE},
                 (Vector2){0},
                 0,
                 gui->color);
@@ -129,7 +129,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
                 globalPackage->fonts[TB_FONT_TYPE_04B03],
                 (i < 2) ? gui->info[i].label : TextFormat("%02d", (i == 2) ? globalGuiData->lives : globalGuiData->pepper),
                 position,
-                24,
+                TINY_BURGER_FONT_SIZE,
                 1,
                 gui->labelColor);
         }
@@ -148,7 +148,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
             globalPackage->fonts[TB_FONT_TYPE_04B03],
             TextFormat((i < 2) ? "%06d" : "%02d", value),
             position,
-            24,
+            TINY_BURGER_FONT_SIZE,
             1,
             gui->color);
         position.x += (i > 1) ? 64 : 128;

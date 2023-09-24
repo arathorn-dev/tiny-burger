@@ -324,16 +324,16 @@ TINY_BURGER static void __draw_loading(void)
     DrawTextEx(
         globalPackage->fonts[TB_FONT_TYPE_04B03],
         "PLAYER 1",
-        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("PLAYER 1", 24) / 2, TINY_BURGER_HEIGHT / 2},
-        24,
+        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("PLAYER 1", TINY_BURGER_FONT_SIZE) / 2, TINY_BURGER_HEIGHT / 2},
+        TINY_BURGER_FONT_SIZE,
         1,
         GetColor(TINY_BURGER_COLOR_5));
 
     DrawTextEx(
         globalPackage->fonts[TB_FONT_TYPE_04B03],
         "READY",
-        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("READY", 24) / 2, TINY_BURGER_HEIGHT / 2 + 32},
-        24,
+        (Vector2){(TINY_BURGER_WIDTH / 2) - MeasureText("READY", TINY_BURGER_FONT_SIZE) / 2, TINY_BURGER_HEIGHT / 2 + 32},
+        TINY_BURGER_FONT_SIZE,
         1,
         GetColor(TINY_BURGER_COLOR_5));
 }

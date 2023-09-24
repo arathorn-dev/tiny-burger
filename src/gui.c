@@ -37,18 +37,7 @@ TINY_BURGER Gui_t *create_gui(void)
         return NULL;
     }
 
-    gui->transform = (Rectangle){
-        0,
-        0,
-        TINY_BURGER_WIDTH,
-        TINY_BURGER_TILE * 2,
-    };
-    gui->color = GetColor(TINY_BURGER_COLOR_0);
-    gui->pepper = 0;
-    gui->lives = 0;
-    gui->currentPoints = 0;
-    gui->maxPoints = 0;
-
+    gui->color = GetColor(TINY_BURGER_COLOR_15);
     __init_info(gui);
 
     return gui;
@@ -98,7 +87,7 @@ TINY_BURGER static void __init_info(Gui_t *const gui)
     gui->info[2].position = (Vector2){0, 0};
     gui->info[2].hasImage = true;
     gui->info[2].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[2].text, "2");
+    TextCopy(gui->info[2].text, "0");
     gui->info[2].imageRect = MemAlloc(sizeof(Rectangle));
     gui->info[2].imageRect->x = TINY_BURGER_TILE * 6;
     gui->info[2].imageRect->y = 0;
@@ -109,7 +98,7 @@ TINY_BURGER static void __init_info(Gui_t *const gui)
     gui->info[3].position = (Vector2){0, 0};
     gui->info[3].hasImage = true;
     gui->info[3].text = MemAlloc(sizeof(char) * size);
-    TextCopy(gui->info[3].text, "2");
+    TextCopy(gui->info[3].text, "0");
     gui->info[3].imageRect = MemAlloc(sizeof(Rectangle));
     gui->info[3].imageRect->x = TINY_BURGER_TILE * 6 + 8;
     gui->info[3].imageRect->y = 0;
@@ -138,7 +127,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
                     24},
                 (Vector2){0},
                 0,
-                RAYWHITE);
+                gui->color);
         }
         else
         {
@@ -148,7 +137,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
                 position,
                 24,
                 1,
-                RAYWHITE);
+                gui->color);
         }
         position.x += (i > 1) ? 32 : 64;
         DrawTextEx(
@@ -157,7 +146,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
             position,
             24,
             1,
-            RAYWHITE);
+            gui->color);
         position.x += (i > 1) ? 64 : 128;
     }
 }

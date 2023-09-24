@@ -12,6 +12,8 @@
 extern Package_t *globalPackage;
 extern bool globalIsCollisionDebug;
 
+GuiData_t *globalGuiData;
+
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
@@ -39,6 +41,8 @@ extern "C"
     TINY_BURGER static const char *__get_level_path(int32_t level);
     TINY_BURGER static Vector2 __get_position_player(int32_t level);
     TINY_BURGER static Vector2 __get_position_enemy(int32_t level);
+    TINY_BURGER static void __init_gui_data(void);
+    TINY_BURGER static void __destroy_gui_data(void);
 
     TINY_BURGER static void __init_hamburger(void);
     TINY_BURGER static void __load_hamburger(int32_t level);
@@ -85,6 +89,7 @@ TINY_BURGER Screen_t *create_game(void)
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
+    __init_gui_data();
     _gui = create_gui();
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
@@ -133,6 +138,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
     if ((*ptr) != NULL)
     {
         destroy_gui(&_gui);
+        __destroy_gui_data();
         __unload_hamburger();
         destroy_player(&_player);
         // destroy_enemy(&_enemy);
@@ -298,6 +304,20 @@ TINY_BURGER static Vector2 __get_position_enemy(int32_t level)
         break;
     }
     return position;
+}
+
+TINY_BURGER static void __init_gui_data(void)
+{
+    globalGuiData = (GuiData_t *)MemAlloc(sizeof(GuiData_t));
+    globalGuiData->pepper = 0;
+    globalGuiData->lives = 0;
+    globalGuiData->currentPoints = 0;
+    globalGuiData->maxPoints = 0;
+}
+TINY_BURGER static void __destroy_gui_data(void)
+{
+    MemFree(globalGuiData);
+    globalGuiData = NULL;
 }
 
 TINY_BURGER static void __init_hamburger(void)

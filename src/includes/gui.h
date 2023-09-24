@@ -5,6 +5,14 @@
 
 TINY_BURGER typedef struct
 {
+    uint32_t pepper;
+    uint32_t lives;
+    uint32_t currentPoints;
+    uint32_t maxPoints;
+} GuiData_t;
+
+TINY_BURGER typedef struct
+{
     Vector2 position;
     char *text;
     bool hasImage;
@@ -18,14 +26,7 @@ TINY_BURGER typedef struct
 
 TINY_BURGER typedef struct
 {
-    Rectangle transform;
     Color color;
-
-    uint32_t pepper;
-    uint32_t lives;
-    uint32_t currentPoints;
-    uint32_t maxPoints;
-
     GuiInfo_t info[TINY_BURGER_INFO_GUI_SIZE];
 } Gui_t;
 

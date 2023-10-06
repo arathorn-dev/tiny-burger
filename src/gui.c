@@ -10,8 +10,6 @@ extern GuiData_t *globalGuiData;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-TINY_BURGER static Image *_image;
-
 #if defined(__cplusplus)
 extern "C"
 {

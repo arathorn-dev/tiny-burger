@@ -1,5 +1,7 @@
 #include "../includes/screen.h"
 #include "../includes/package.h"
+#include "../includes/pointer.h"
+#include "../includes/logo.h"
 
 #define __MENU_SIZE 3
 
@@ -18,6 +20,8 @@ static const char *_options[__MENU_SIZE] = {
     "EXIT"};
 static Vector2 _optionsPosition[__MENU_SIZE];
 static int32_t currentOption = 0;
+static Pointer_t *pointer = NULL;
+static Logo_t *logo = NULL;
 
 #if defined(__cplusplus)
 extern "C"
@@ -48,38 +52,38 @@ TINY_BURGER Screen_t *create_menu(void)
 
     screen->currentScreenType = TB_SCREEN_TYPE_MENU;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
-
-    TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer created successfully.");
     __load_options();
+
+    pointer = create_pointer(_optionsPosition[currentOption]);
+    if (!pointer)
+    {
+        MemFree(screen);
+        screen = NULL;
+        return NULL;
+    }
+
+    logo = create_logo();
+    if (!logo)
+    {
+        destroy_pointer(&pointer);
+        MemFree(screen);
+        screen = NULL;
+        return NULL;
+    }
+    TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer created successfully.");
+
     return screen;
 }
 
 TINY_BURGER void update_menu(Screen_t *const screen)
 {
     __update_options(screen);
+    update_pointer(pointer, _optionsPosition[currentOption]);
 }
 TINY_BURGER void draw_menu(const Screen_t *const screen)
 {
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, GetColor(TINY_BURGER_COLOR_0));
-    /// ----
-    DrawTexturePro(
-        globalPackage->textures[TB_TEXTURE_TYPE_TILE],
-        (Rectangle){
-            0,
-            TINY_BURGER_TILE * 6,
-            TINY_BURGER_TILE * 6,
-            TINY_BURGER_FONT_SIZE},
-        (Rectangle){
-            TINY_BURGER_WIDTH / 6.5,
-            TINY_BURGER_HEIGHT / 5,
-            TINY_BURGER_TILE * 6 * 5,
-            TINY_BURGER_FONT_SIZE * 5},
-        (Vector2){0},
-        0,
-        RAYWHITE);
-
-    /// ----
-
+    draw_logo(logo);
     __draw_options();
 }
 
@@ -87,6 +91,8 @@ TINY_BURGER void destroy_menu(Screen_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        destroy_logo(&logo);
+        destroy_pointer(&pointer);
         MemFree((*ptr));
         (*ptr) = NULL;
         TraceLog(LOG_DEBUG, "[MENU] Screen_t pointer destroyed successfully.");
@@ -138,6 +144,7 @@ TINY_BURGER static void __draw_options(void)
             1.0,
             currentOption == i ? selectedColor : normalColor);
     }
+    draw_pointer(pointer);
 }
 
 TINY_BURGER static void __select_option(Screen_t *const screen)

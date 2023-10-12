@@ -12,7 +12,7 @@
 extern Package_t *globalPackage;
 extern bool globalIsCollisionDebug;
 
-GuiData_t *globalGuiData;
+GuiData_t *globalGuiData = NULL;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
@@ -203,6 +203,8 @@ TINY_BURGER static bool __load_level(int32_t level)
         // destroy_enemy(&_enemy);
         _maxHamburger = 0;
         _countHamburger = 0;
+        if (globalGuiData != NULL)
+            globalGuiData->hamburgerCounter = 0;
         _player = create_player(__get_position_player(level));
         if (_player != NULL)
         {
@@ -304,6 +306,7 @@ TINY_BURGER static void __init_gui_data(void)
     globalGuiData->lives = 0;
     globalGuiData->currentPoints = 0;
     globalGuiData->maxPoints = 0;
+    globalGuiData->hamburgerCounter = 0;
 }
 TINY_BURGER static void __destroy_gui_data(void)
 {
@@ -443,6 +446,7 @@ TINY_BURGER static void __update_hamburger(void)
             {
                 _isHamburgerCompletedByIndex[i] = true;
                 ++_countHamburger;
+                globalGuiData->hamburgerCounter = _countHamburger;
             }
         }
     }

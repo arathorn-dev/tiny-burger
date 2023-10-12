@@ -18,6 +18,7 @@ extern "C"
     TINY_BURGER static void __init_info(Gui_t *const gui);
     TINY_BURGER static void __update_info(Gui_t *const gui);
     TINY_BURGER static void __draw_info(const Gui_t *const gui);
+    TINY_BURGER static void __draw_hamburger(void);
     TINY_BURGER static void __destroy_info(Gui_t *const gui);
 
 #if defined(__cplusplus)
@@ -49,6 +50,7 @@ TINY_BURGER void update_gui(Gui_t *const gui)
 TINY_BURGER void draw_gui(const Gui_t *const gui)
 {
     __draw_info(gui);
+    __draw_hamburger();
 }
 TINY_BURGER void destroy_gui(Gui_t **ptr)
 {
@@ -150,6 +152,30 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
             1,
             gui->color);
         position.x += (i > 1) ? 64 : 128;
+    }
+}
+
+TINY_BURGER static void __draw_hamburger(void)
+{
+    Vector2 position = (Vector2){20, 70};
+    for (size_t i = 0; i < globalGuiData->hamburgerCounter; ++i)
+    {
+        DrawTexturePro(
+            globalPackage->textures[TB_TEXTURE_TYPE_TILE],
+            (Rectangle){
+                TINY_BURGER_TILE * 6,
+                9,
+                7,
+                8},
+            (Rectangle){
+                position.x,
+                position.y,
+                24,
+                24},
+            (Vector2){0},
+            0.0f,
+            RAYWHITE);
+        position.y += 28;
     }
 }
 

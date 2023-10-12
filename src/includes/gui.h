@@ -9,6 +9,7 @@ TINY_BURGER typedef struct
     uint32_t lives;
     uint32_t currentPoints;
     uint32_t maxPoints;
+    uint32_t hamburgerCounter;
 } GuiData_t;
 
 TINY_BURGER typedef struct

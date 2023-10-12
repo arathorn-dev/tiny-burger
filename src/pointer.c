@@ -29,10 +29,10 @@ TINY_BURGER Pointer_t *create_pointer(Vector2 position)
         TINY_BURGER_TILE * 5,
         TINY_BURGER_TILE * 5,
         6,
-        8};
+        9};
     pointer->dimension = (Vector2){
         5 * 2,
-        8 * 2};
+        9 * 2};
 
     return pointer;
 }

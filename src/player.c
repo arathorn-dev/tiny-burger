@@ -9,13 +9,6 @@ extern Package_t *globalPackage;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-TINY_BURGER typedef enum {
-    PLAYER_ANIMATION_IDLE = 10,
-    PLAYER_ANIMATION_RUN,
-    PLAYER_ANIMATION_IDLE_STAIR,
-    PLAYER_ANIMATION_IDLE_STAIR_MOV,
-    PLAYER_ANIMATION_RUN_STAIR,
-} PlayerAnimation_u;
 
 TINY_BURGER static bool _flipH = true;
 
@@ -82,6 +75,12 @@ TINY_BURGER void update_player(Player_t *const player, const int32_t *const vect
     {
         __movement_player(player, vector);
     }
+    update_animation_player(player->ap);
+}
+
+TINY_BURGER void update_player_without_movement(Player_t *const player, uint32_t animation)
+{
+    set_animation_player(player->ap, animation);
     update_animation_player(player->ap);
 }
 
@@ -219,7 +218,7 @@ TINY_BURGER static void __linear_interpolation(Player_t *const player)
 
 TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
 {
-    AnimationPlayer_t *ap = create_animation_player(5);
+    AnimationPlayer_t *ap = create_animation_player(TINY_BURGER_PLAYER_ANIMATION_LENGTH);
     if (ap != NULL)
     {
         Rectangle idle[] = {
@@ -245,11 +244,18 @@ TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
             (Rectangle){6 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
         };
 
+        Rectangle win[] = {
+            (Rectangle){7 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){8 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){9 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE, idle, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN, run, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_WIN, win, 3);
         set_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR);
     }
 

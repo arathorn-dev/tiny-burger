@@ -34,8 +34,13 @@ TINY_BURGER static Hamburger_t *_hamburger[TINY_BURGER_MAX_HAMBURGER_SIZE];
 
 TINY_BURGER static bool _isLoading = true;
 TINY_BURGER static uint32_t _fpsLoading = 0;
-TINY_BURGER static uint32_t _countLoading = 0;
-TINY_BURGER static uint32_t _maxLoading = 2;
+TINY_BURGER static uint32_t _counterLoading = 0;
+TINY_BURGER static uint32_t _maxTimeLoading = 2;
+
+TINY_BURGER static bool _isTransition = false;
+TINY_BURGER static uint32_t _fpsTransition = 0;
+TINY_BURGER static uint32_t _counterTransition = 0;
+TINY_BURGER static uint32_t _maxTimeTransition = 3;
 
 #if defined(__cplusplus)
 extern "C"
@@ -67,6 +72,9 @@ extern "C"
     TINY_BURGER static void __loadl_level3(void);
     TINY_BURGER static void __loadl_level4(void);
     TINY_BURGER static void __loadl_level5(void);
+
+    TINY_BURGER static void __update_transition(void);
+    TINY_BURGER static void __reset_transition(void);
 
 #if defined(__cplusplus)
 }
@@ -123,8 +131,13 @@ TINY_BURGER Screen_t *create_game(void)
 
 TINY_BURGER void update_game(Screen_t *const screen)
 {
+    if (IsKeyPressed(KEY_ESCAPE))
+        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
+
     if (_isLoading)
         __update_loading();
+    else if (_isTransition)
+        __update_transition();
     else
         __update(screen);
 }
@@ -166,6 +179,33 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
+TINY_BURGER static void __update_transition(void)
+{
+    if (_fpsTransition >= TINY_BURGER_FPS)
+    {
+        _counterTransition++;
+        _fpsTransition = 0;
+    }
+    else
+    {
+        update_player_without_movement(_player, PLAYER_ANIMATION_WIN);
+        _fpsTransition++;
+    }
+
+    if (_counterTransition > _maxTimeTransition)
+    {
+        __load_level(_currentLevel + 1);
+    }
+}
+
+TINY_BURGER static void __reset_transition(void)
+{
+    _isTransition = false;
+    _fpsTransition = 0;
+    _counterTransition = 0;
+    _maxTimeTransition = 3;
+}
+
 TINY_BURGER static void __destroy_screen(Screen_t **ptr)
 {
     if ((*ptr) != NULL)
@@ -214,9 +254,10 @@ TINY_BURGER static void __draw_map(void)
 TINY_BURGER static bool __load_level(int32_t level)
 {
     bool isLoaded = false;
-    if (_currentLevel != level)
+    if (level < TINY_BURGER_LEVEL_SIZE && _currentLevel != level)
     {
         __reset_loading();
+        __reset_transition();
         __unload_hamburger();
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
@@ -324,7 +365,7 @@ TINY_BURGER static void __reset_loading(void)
 {
     _isLoading = true;
     _fpsLoading = 0;
-    _countLoading = 0;
+    _counterLoading = 0;
 }
 
 // TODO: Improve the function code.
@@ -351,13 +392,13 @@ TINY_BURGER static void __update_loading(void)
 {
     if (_fpsLoading >= TINY_BURGER_FPS)
     {
-        _countLoading++;
+        _counterLoading++;
         _fpsLoading = 0;
     }
     else
         _fpsLoading++;
 
-    if (_countLoading > _maxLoading)
+    if (_counterLoading > _maxTimeLoading)
     {
         _isLoading = false;
     }
@@ -378,12 +419,8 @@ TINY_BURGER static void __draw(const Screen_t *const screen)
 
 TINY_BURGER static void __update(Screen_t *const screen)
 {
-    if (IsKeyPressed(KEY_ESCAPE))
-    {
-        screen->nextScreenType = TB_SCREEN_TYPE_MENU;
-    }
 
-    else if (IsKeyPressed(KEY_F1))
+    if (IsKeyPressed(KEY_F1))
         __load_level(0);
     else if (IsKeyPressed(KEY_F2))
         __load_level(1);
@@ -396,18 +433,17 @@ TINY_BURGER static void __update(Screen_t *const screen)
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
 
-    // ----
-    if (_countHamburger >= _maxHamburger && (_currentLevel + 1) < 6)
+    if (_countHamburger >= _maxHamburger)
     {
-        __load_level(_currentLevel + 1);
+        _isTransition = true;
     }
-
-    // ----
-
-    update_gui(_gui);
-    __update_hamburger();
-    update_player(_player, _vectorPath);
-    // update_enemy(_enemy, _vectorPath, _player);
+    else
+    {
+        update_gui(_gui);
+        __update_hamburger();
+        update_player(_player, _vectorPath);
+        // update_enemy(_enemy, _vectorPath, _player);
+    }
 }
 
 TINY_BURGER static void __init_hamburger(void)

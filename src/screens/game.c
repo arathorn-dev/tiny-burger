@@ -73,7 +73,7 @@ extern "C"
     TINY_BURGER static void __loadl_level4(void);
     TINY_BURGER static void __loadl_level5(void);
 
-    TINY_BURGER static void __update_transition(void);
+    TINY_BURGER static void __update_transition(Screen_t *const screen);
     TINY_BURGER static void __reset_transition(void);
 
 #if defined(__cplusplus)
@@ -137,7 +137,7 @@ TINY_BURGER void update_game(Screen_t *const screen)
     if (_isLoading)
         __update_loading();
     else if (_isTransition)
-        __update_transition();
+        __update_transition(screen);
     else
         __update(screen);
 }
@@ -179,7 +179,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
-TINY_BURGER static void __update_transition(void)
+TINY_BURGER static void __update_transition(Screen_t *const screen)
 {
     if (_fpsTransition >= TINY_BURGER_FPS)
     {
@@ -194,7 +194,10 @@ TINY_BURGER static void __update_transition(void)
 
     if (_counterTransition > _maxTimeTransition)
     {
-        __load_level(_currentLevel + 1);
+        if ((_currentLevel + 1) < TINY_BURGER_LEVEL_SIZE)
+            __load_level(_currentLevel + 1);
+        else
+            screen->nextScreenType = TB_SCREEN_TYPE_MENU;
     }
 }
 
@@ -283,6 +286,7 @@ TINY_BURGER static bool __load_level(int32_t level)
                 _isHamburgerCompletedByIndex[i] = false;
         }
     }
+
     return isLoaded;
 }
 

@@ -9,7 +9,7 @@ TINY_BURGER typedef struct
     uint32_t lives;
     uint32_t currentPoints;
     uint32_t maxPoints;
-    uint32_t hamburgerCounter;
+    uint32_t levelCounter;
 } GuiData_t;
 
 TINY_BURGER typedef struct
@@ -35,6 +35,9 @@ TINY_BURGER typedef struct
 extern "C"
 {
 #endif
+
+    TINY_BURGER GuiData_t *create_gui_data(void);
+    TINY_BURGER void destroy_gui_data(GuiData_t **ptr);
 
     TINY_BURGER Gui_t *create_gui(void);
     TINY_BURGER void update_gui(Gui_t *const gui);

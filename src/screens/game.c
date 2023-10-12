@@ -41,13 +41,12 @@ TINY_BURGER static uint32_t _maxLoading = 2;
 extern "C"
 {
 #endif
+    TINY_BURGER static void __destroy_screen(Screen_t **ptr);
     TINY_BURGER static void __draw_map(void);
     TINY_BURGER static bool __load_level(int32_t level);
     TINY_BURGER static const char *__get_level_path(int32_t level);
     TINY_BURGER static Vector2 __get_position_player(int32_t level);
     TINY_BURGER static Vector2 __get_position_enemy(int32_t level);
-    TINY_BURGER static void __init_gui_data(void);
-    TINY_BURGER static void __destroy_gui_data(void);
 
     TINY_BURGER static void __reset_loading(void);
     TINY_BURGER static void __draw_loading(void);
@@ -84,11 +83,28 @@ TINY_BURGER Screen_t *create_game(void)
         TraceLog(LOG_DEBUG, "[GAME] Error to create a Screen_t pointer.");
         return NULL;
     }
+
+    globalGuiData = create_gui_data();
+    if (!globalGuiData)
+    {
+        __destroy_screen(&screen);
+        return NULL;
+    }
+
+    _gui = create_gui();
+    if (!_gui)
+    {
+        destroy_gui_data(&globalGuiData);
+        __destroy_screen(&screen);
+        return NULL;
+    }
+
     if (!__load_level(0))
     {
-        MemFree(screen);
-        screen = NULL;
-        return screen;
+        destroy_gui_data(&globalGuiData);
+        destroy_gui(&_gui);
+        __destroy_screen(&screen);
+        return NULL;
     }
 
     _camera = MemAlloc(sizeof(Camera2D));
@@ -100,8 +116,6 @@ TINY_BURGER Screen_t *create_game(void)
     screen->currentScreenType = TB_SCREEN_TYPE_GAME;
     screen->nextScreenType = TB_SCREEN_TYPE_EMPTY;
     screen->background = GetColor(TINY_BURGER_COLOR_0);
-    __init_gui_data();
-    _gui = create_gui();
 
     TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer created successfully.");
     return screen;
@@ -128,7 +142,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
     if ((*ptr) != NULL)
     {
         destroy_gui(&_gui);
-        __destroy_gui_data();
+        destroy_gui_data(&globalGuiData);
         __unload_hamburger();
         destroy_player(&_player);
         // destroy_enemy(&_enemy);
@@ -146,14 +160,21 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
         _maxHamburger = 0;
         _countHamburger = 0;
 
-        MemFree((*ptr));
-        (*ptr) = NULL;
-        TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer destroyed successfully.");
+        __destroy_screen(ptr);
     }
 }
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
+TINY_BURGER static void __destroy_screen(Screen_t **ptr)
+{
+    if ((*ptr) != NULL)
+    {
+        MemFree((*ptr));
+        (*ptr) = NULL;
+        TraceLog(LOG_DEBUG, "[GAME] Screen_t pointer destroyed successfully.");
+    }
+}
 
 TINY_BURGER static void __draw_map(void)
 {
@@ -204,7 +225,7 @@ TINY_BURGER static bool __load_level(int32_t level)
         _maxHamburger = 0;
         _countHamburger = 0;
         if (globalGuiData != NULL)
-            globalGuiData->hamburgerCounter = 0;
+            globalGuiData->levelCounter = level + 1;
         _player = create_player(__get_position_player(level));
         if (_player != NULL)
         {
@@ -297,21 +318,6 @@ TINY_BURGER static Vector2 __get_position_enemy(int32_t level)
         break;
     }
     return position;
-}
-
-TINY_BURGER static void __init_gui_data(void)
-{
-    globalGuiData = (GuiData_t *)MemAlloc(sizeof(GuiData_t));
-    globalGuiData->pepper = 0;
-    globalGuiData->lives = 0;
-    globalGuiData->currentPoints = 0;
-    globalGuiData->maxPoints = 0;
-    globalGuiData->hamburgerCounter = 0;
-}
-TINY_BURGER static void __destroy_gui_data(void)
-{
-    MemFree(globalGuiData);
-    globalGuiData = NULL;
 }
 
 TINY_BURGER static void __reset_loading(void)
@@ -446,7 +452,6 @@ TINY_BURGER static void __update_hamburger(void)
             {
                 _isHamburgerCompletedByIndex[i] = true;
                 ++_countHamburger;
-                globalGuiData->hamburgerCounter = _countHamburger;
             }
         }
     }

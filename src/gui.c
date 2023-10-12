@@ -28,6 +28,28 @@ extern "C"
 //----------------------------------------------------------------------------------
 // Public Functions Implementation.
 //----------------------------------------------------------------------------------
+TINY_BURGER GuiData_t *create_gui_data(void)
+{
+    GuiData_t *globalGuiData = (GuiData_t *)MemAlloc(sizeof(GuiData_t));
+    globalGuiData->pepper = 0;
+    globalGuiData->lives = 0;
+    globalGuiData->currentPoints = 0;
+    globalGuiData->maxPoints = 0;
+    globalGuiData->levelCounter = 0;
+    TraceLog(LOG_DEBUG, "GuiData_t pointer created successfully.");
+    return globalGuiData;
+}
+
+TINY_BURGER void destroy_gui_data(GuiData_t **ptr)
+{
+    if ((*ptr) != NULL)
+    {
+        MemFree((*ptr));
+        (*ptr) = NULL;
+        TraceLog(LOG_DEBUG, "GuiData_t pointer destroyed successfully.");
+    }
+}
+
 TINY_BURGER Gui_t *create_gui(void)
 {
     Gui_t *gui = MemAlloc(sizeof(Gui_t));
@@ -43,15 +65,18 @@ TINY_BURGER Gui_t *create_gui(void)
 
     return gui;
 }
+
 TINY_BURGER void update_gui(Gui_t *const gui)
 {
     __update_info(gui);
 }
+
 TINY_BURGER void draw_gui(const Gui_t *const gui)
 {
     __draw_info(gui);
     __draw_hamburger();
 }
+
 TINY_BURGER void destroy_gui(Gui_t **ptr)
 {
     if ((*ptr) != NULL)
@@ -158,7 +183,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
 TINY_BURGER static void __draw_hamburger(void)
 {
     Vector2 position = (Vector2){20, 70};
-    for (size_t i = 0; i < globalGuiData->hamburgerCounter; ++i)
+    for (size_t i = 0; i < globalGuiData->levelCounter; ++i)
     {
         DrawTexturePro(
             globalPackage->textures[TB_TEXTURE_TYPE_TILE],

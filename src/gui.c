@@ -10,6 +10,10 @@ extern GuiData_t *globalGuiData;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
+
+static Rectangle hamburgerRectSource = {0};
+static float hamburgerDimension = 24;
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -36,6 +40,12 @@ TINY_BURGER GuiData_t *create_gui_data(void)
     globalGuiData->currentPoints = 0;
     globalGuiData->maxPoints = 0;
     globalGuiData->levelCounter = 0;
+
+    hamburgerRectSource = (Rectangle){
+        TINY_BURGER_TILE * 6,
+        9,
+        7,
+        8};
     TraceLog(LOG_DEBUG, "GuiData_t pointer created successfully.");
     return globalGuiData;
 }
@@ -187,20 +197,16 @@ TINY_BURGER static void __draw_hamburger(void)
     {
         DrawTexturePro(
             globalPackage->textures[TB_TEXTURE_TYPE_TILE],
-            (Rectangle){
-                TINY_BURGER_TILE * 6,
-                9,
-                7,
-                8},
+            hamburgerRectSource,
             (Rectangle){
                 position.x,
                 position.y,
-                24,
-                24},
+                hamburgerDimension,
+                hamburgerDimension},
             (Vector2){0},
             0.0f,
             RAYWHITE);
-        position.y += 28;
+        position.y += hamburgerDimension;
     }
 }
 

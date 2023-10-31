@@ -121,6 +121,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     int32_t j = player->position.x;
     PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
     uint32_t currentTile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+    bool isShooting = false;
 
     if (IsKeyDown(KEY_UP))
     {
@@ -138,8 +139,16 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     {
         __horizontal_movement(&position, vector, 1);
     }
+    else if (IsKeyDown(KEY_SPACE))
+    {
+        isShooting =
+            player->ap->currentAnimation->id != PLAYER_ANIMATION_RUN_STAIR &&
+            player->ap->currentAnimation->id != PLAYER_ANIMATION_IDLE_STAIR_MOV;
+        if (isShooting)
+            animation = PLAYER_ANIMATION_SHOOT;
+    }
 
-    if (player->position.x != position.x || player->position.y != position.y)
+    if (!isShooting && (player->position.x != position.x || player->position.y != position.y))
     {
         if (player->position.y != position.y)
             animation = PLAYER_ANIMATION_RUN_STAIR;
@@ -148,7 +157,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
         player->isInterpolation = true;
         _interpolationPosition = position;
     }
-    else
+    else if (!isShooting)
     {
         uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
         if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)
@@ -156,6 +165,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
         else if (downTile >= 3 && downTile <= 4 && currentTile >= 1 && currentTile <= 4)
             animation = PLAYER_ANIMATION_IDLE_STAIR_MOV;
     }
+
     set_animation_player(player->ap, animation);
 }
 
@@ -250,12 +260,18 @@ TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
             (Rectangle){9 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
         };
 
+        Rectangle shoot[] = {
+            (Rectangle){10 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){11 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE, idle, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN, run, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_WIN, win, 3);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_SHOOT, shoot, 2);
         set_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR);
     }
 

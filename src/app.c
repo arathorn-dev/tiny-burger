@@ -99,7 +99,7 @@ TINY_BURGER void destroy_app(App_t **ptr)
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __init_window(void)
 {
-    SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    // SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, TINY_BURGER_TITLE);
     HideCursor();
     SetTargetFPS(TINY_BURGER_FPS);

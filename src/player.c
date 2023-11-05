@@ -1,5 +1,8 @@
 #include "includes/player.h"
+#include "includes/config.h"
+#include "includes/gun.h"
 #include "includes/package.h"
+#include "includes/raylib.h"
 
 //----------------------------------------------------------------------------------
 // Global.
@@ -46,9 +49,17 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         return NULL;
     }
 
+    player->gun = create_gun(position);
+    if (player->gun == NULL) {
+        MemFree(player);
+        player = NULL;
+        return player;
+    }
+
     player->ap = __init_animation_player();
     if (player->ap == NULL)
     {
+        destroy_gun(&(player->gun));
         MemFree(player);
         player = NULL;
         return player;
@@ -76,17 +87,32 @@ TINY_BURGER void update_player(Player_t *const player, const int32_t *const vect
         __movement_player(player, vector);
     }
     update_animation_player(player->ap);
+    
+    float diff = (_flipH) ? 16 : 0;
+    Vector2 position = (Vector2) {
+        player->position.x * TINY_BURGER_TILE + diff,
+        player->position.y * TINY_BURGER_TILE + 12
+    };
+    update_gun(player->gun, position);
 }
 
 TINY_BURGER void update_player_without_movement(Player_t *const player, uint32_t animation)
 {
     set_animation_player(player->ap, animation);
     update_animation_player(player->ap);
+    
+    Vector2 position = (Vector2) {
+        player->position.x + (((_flipH) ? 16 : - 16) * TINY_BURGER_TILE),
+        player->position.y
+    };
+    update_gun(player->gun, position);
 }
 
 TINY_BURGER void draw_player(const Player_t *const player)
 {
+
     draw_animation_player(player->ap, player->position, _flipH);
+    draw_gun(player->gun);
 }
 
 TINY_BURGER void destroy_player(Player_t **ptr)
@@ -95,6 +121,7 @@ TINY_BURGER void destroy_player(Player_t **ptr)
     {
         __reset_interpolation((*ptr));
         destroy_animation_player(&((*ptr)->ap));
+        destroy_gun(&((*ptr)->gun));
         MemFree((*ptr));
         (*ptr) = NULL;
         TraceLog(LOG_DEBUG, "App_t pointer destroyed successfully.");

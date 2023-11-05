@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "animation_player.h"
+#include "gun.h"
 
 TINY_BURGER typedef enum {
     PLAYER_ANIMATION_IDLE = 10,
@@ -18,9 +19,10 @@ TINY_BURGER typedef enum {
 TINY_BURGER typedef struct
 {
     Vector2 position;
-    AnimationPlayer_t *ap;
     bool isInterpolation;
     Rectangle collisionShape;
+    AnimationPlayer_t *ap;
+    Gun_t *gun;
 } Player_t;
 
 #if defined(__cplusplus)

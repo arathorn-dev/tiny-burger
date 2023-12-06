@@ -11,4 +11,3 @@ int main(void)
     destroy_app(&app);
     return 0;
 }
-

@@ -2,18 +2,21 @@
 #include "includes/config.h"
 #include "includes/gun.h"
 #include "includes/package.h"
+#include "includes/gui.h"
 #include "includes/raylib.h"
 
 //----------------------------------------------------------------------------------
 // Global.
 //----------------------------------------------------------------------------------
 extern Package_t *globalPackage;
+extern GuiData_t *globalGuiData;
 
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
 
 TINY_BURGER static bool _flipH = true;
+TINY_BURGER static bool _isShooting = false;
 
 TINY_BURGER static float _interpolationValue = 0.0f;
 TINY_BURGER static float _interpolationMaxValue = 0.8f;
@@ -50,7 +53,8 @@ TINY_BURGER Player_t *create_player(Vector2 position)
     }
 
     player->gun = create_gun(position);
-    if (player->gun == NULL) {
+    if (player->gun == NULL)
+    {
         MemFree(player);
         player = NULL;
         return player;
@@ -87,30 +91,18 @@ TINY_BURGER void update_player(Player_t *const player, const int32_t *const vect
         __movement_player(player, vector);
     }
     update_animation_player(player->ap);
-    
-    float diff = (_flipH) ? 16 : 0;
-    Vector2 position = (Vector2) {
-        player->position.x * TINY_BURGER_TILE + diff,
-        player->position.y * TINY_BURGER_TILE + 12
-    };
-    update_gun(player->gun, position);
+    update_gun(player->gun, _isShooting, _flipH, player->position);
 }
 
 TINY_BURGER void update_player_without_movement(Player_t *const player, uint32_t animation)
 {
     set_animation_player(player->ap, animation);
     update_animation_player(player->ap);
-    
-    Vector2 position = (Vector2) {
-        player->position.x + (((_flipH) ? 16 : - 16) * TINY_BURGER_TILE),
-        player->position.y
-    };
-    update_gun(player->gun, position);
+    update_gun(player->gun, _isShooting, _flipH, player->position);
 }
 
 TINY_BURGER void draw_player(const Player_t *const player)
 {
-
     draw_animation_player(player->ap, player->position, _flipH);
     draw_gun(player->gun);
 }
@@ -148,7 +140,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     int32_t j = player->position.x;
     PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
     uint32_t currentTile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
-    bool isShooting = false;
+    _isShooting = false;
 
     if (IsKeyDown(KEY_UP))
     {
@@ -166,16 +158,18 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
     {
         __horizontal_movement(&position, vector, 1);
     }
-    else if (IsKeyDown(KEY_SPACE))
+    else if (globalGuiData->bulletAmount > 0 && IsKeyDown(KEY_SPACE))
     {
-        isShooting =
+        _isShooting =
             player->ap->currentAnimation->id != PLAYER_ANIMATION_RUN_STAIR &&
             player->ap->currentAnimation->id != PLAYER_ANIMATION_IDLE_STAIR_MOV;
-        if (isShooting)
+        if (_isShooting)
+        {
             animation = PLAYER_ANIMATION_SHOOT;
+        }
     }
 
-    if (!isShooting && (player->position.x != position.x || player->position.y != position.y))
+    if (!_isShooting && (player->position.x != position.x || player->position.y != position.y))
     {
         if (player->position.y != position.y)
             animation = PLAYER_ANIMATION_RUN_STAIR;
@@ -184,7 +178,7 @@ TINY_BURGER static void __movement_player(Player_t *const player, const int32_t 
         player->isInterpolation = true;
         _interpolationPosition = position;
     }
-    else if (!isShooting)
+    else if (!_isShooting)
     {
         uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
         if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)

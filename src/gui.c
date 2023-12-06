@@ -35,7 +35,7 @@ extern "C"
 TINY_BURGER GuiData_t *create_gui_data(void)
 {
     GuiData_t *globalGuiData = (GuiData_t *)MemAlloc(sizeof(GuiData_t));
-    globalGuiData->pepper = 0;
+    globalGuiData->bulletAmount = 30;
     globalGuiData->lives = 0;
     globalGuiData->currentPoints = 0;
     globalGuiData->maxPoints = 0;
@@ -162,7 +162,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
         {
             DrawTextEx(
                 globalPackage->fonts[TB_FONT_TYPE_04B03],
-                (i < 2) ? gui->info[i].label : TextFormat("%02d", (i == 2) ? globalGuiData->lives : globalGuiData->pepper),
+                (i < 2) ? gui->info[i].label : TextFormat("%02d", (i == 2) ? globalGuiData->lives : globalGuiData->bulletAmount),
                 position,
                 TINY_BURGER_FONT_SIZE,
                 1,
@@ -175,7 +175,7 @@ TINY_BURGER static void __draw_info(const Gui_t *const gui)
         if (i == 1)
             value = globalGuiData->currentPoints;
         if (i == 2)
-            value = globalGuiData->pepper;
+            value = globalGuiData->bulletAmount;
         if (i == 3)
             value = globalGuiData->lives;
 

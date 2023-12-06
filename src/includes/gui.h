@@ -5,7 +5,7 @@
 
 TINY_BURGER typedef struct
 {
-    uint32_t pepper;
+    uint32_t bulletAmount;
     uint32_t lives;
     uint32_t currentPoints;
     uint32_t maxPoints;

@@ -16,8 +16,8 @@ TINY_BURGER typedef struct
     Rectangle collisionShape;
     IngredientPath_t *path;
     uint32_t indexIngredient;
-    bool isCollision;
-    bool isCompleted;
+    bool collision;
+    bool completed;
 
 } Hamburger_t;
 

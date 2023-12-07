@@ -40,8 +40,8 @@ TINY_BURGER Ingredient_t *create_ingredient(IngredientType_u type, Vector2 posit
 
     ingredient->position = position;
     ingredient->type = type;
-    ingredient->isCollision = false;
-    ingredient->isCompleted = false;
+    ingredient->collision = false;
+    ingredient->completed = false;
     ingredient->time = 0.0f;
     ingredient->pathIndex = pathIndex;
     ingredient->index = index;
@@ -75,7 +75,7 @@ TINY_BURGER bool is_check_ingredient(const Ingredient_t *const ingredient)
 
 TINY_BURGER bool is_completed_ingredient(const Ingredient_t *const ingredient)
 {
-    return ingredient->isCompleted;
+    return ingredient->completed;
 }
 
 TINY_BURGER Rectangle get_collision_shape_ingredient(const Ingredient_t *const ingredient)
@@ -262,18 +262,18 @@ TINY_BURGER static void __check_collision_ingredient(Ingredient_t *const ingredi
             TINY_BURGER_TILE * 3,
             TINY_BURGER_TILE};
 
-        ingredient->isCollision = CheckCollisionRecs(shape, collisionShape);
+        ingredient->collision = CheckCollisionRecs(shape, collisionShape);
     }
-    else if (ingredient->isCollision)
+    else if (ingredient->collision)
     {
-        ingredient->isCollision = false;
+        ingredient->collision = false;
     }
 }
 
 TINY_BURGER static void __check_collision_ingredient_segment(Ingredient_t *const ingredient, Rectangle collisionShape)
 {
     bool isCheck = ingredient->segment[0].check && ingredient->segment[1].check && ingredient->segment[2].check;
-    if (ingredient->isCollision && !isCheck)
+    if (ingredient->collision && !isCheck)
     {
         for (uint32_t i = 0; i < 3; ++i)
         {
@@ -325,8 +325,8 @@ TINY_BURGER static void __linear_interpolation(Ingredient_t *const ingredient, V
     {
         set_segment_check_ingredient(ingredient, false);
         ingredient->position = position;
-        ingredient->isCollision = false;
-        ingredient->isCompleted = isLast;
+        ingredient->collision = false;
+        ingredient->completed = isLast;
         ingredient->time = 0.0f;
         globalGuiData->currentPoints += 50;
     }

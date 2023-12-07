@@ -73,7 +73,7 @@ TINY_BURGER App_t *create_app(void)
         return NULL;
     }
 
-    app->isRunning = true;
+    app->running = true;
     app->background = GetColor(TINY_BURGER_COLOR_0);
     TraceLog(LOG_DEBUG, "App_t pointer created successfully.");
     return app;
@@ -81,7 +81,7 @@ TINY_BURGER App_t *create_app(void)
 
 TINY_BURGER void run_app(App_t *app)
 {
-    while (app->isRunning)
+    while (app->running)
     {
         __update_window(app);
         __draw_window(app);
@@ -142,7 +142,7 @@ TINY_BURGER static void __update_window(App_t *app)
             if (app->screen->nextScreenType != TB_SCREEN_TYPE_EMPTY)
             {
                 if (app->screen->nextScreenType == TB_SCREEN_TYPE_EXIT)
-                    app->isRunning = false;
+                    app->running = false;
                 else
                     __transition_screen(app->screen, app->screen->nextScreenType);
             }
@@ -275,7 +275,7 @@ TINY_BURGER static void __change_screen_to(App_t *app, ScreenType_u next)
         app->screen = __load_screen(next);
         if (app->screen == NULL)
         {
-            app->isRunning = false;
+            app->running = false;
         }
     }
 }

@@ -23,6 +23,14 @@ TINY_BURGER Bullet_t *create_bullet(Vector2 position, bool right)
         return NULL;
     }
 
+    bullet->particleList = create_particle_list(30);
+    if (bullet->particleList == NULL)
+    {
+        MemFree(bullet);
+        bullet = NULL;
+        return NULL;
+    }
+
     bullet->rect = (Rectangle){
         position.x,
         position.y,
@@ -49,6 +57,7 @@ TINY_BURGER void update_bullet(Bullet_t *const bullet, Vector2 position)
         bullet->rect.x = position.x;
         bullet->rect.y = position.y;
     }
+    update_particle_list(bullet->particleList);
 }
 
 TINY_BURGER void draw_bullet(const Bullet_t *const bullet)
@@ -57,6 +66,7 @@ TINY_BURGER void draw_bullet(const Bullet_t *const bullet)
     {
         DrawRectangleRec(bullet->rect, bullet->color);
     }
+    draw_particle_list(bullet->particleList);
 }
 
 TINY_BURGER void set_active_bullet(Bullet_t *bullet, bool right)
@@ -65,10 +75,17 @@ TINY_BURGER void set_active_bullet(Bullet_t *bullet, bool right)
     bullet->right = right;
 }
 
+TINY_BURGER void active_particle_bullet(Bullet_t *const bullet)
+{
+    bullet->active = false;
+    active_particle_list(bullet->particleList, (Vector2){bullet->rect.x, bullet->rect.y});
+}
+
 TINY_BURGER void destroy_bullet(Bullet_t **ptr)
 {
     if ((*ptr) != NULL)
     {
+        destroy_particle_list(&(*ptr)->particleList);
         MemFree((*ptr));
         (*ptr) = NULL;
         TraceLog(LOG_DEBUG, "Bullet_t pointer destroyed successfully.");

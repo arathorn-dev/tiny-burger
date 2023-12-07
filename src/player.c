@@ -14,9 +14,9 @@ extern GuiData_t *globalGuiData;
 //----------------------------------------------------------------------------------
 // Static Definition.
 //----------------------------------------------------------------------------------
-
-TINY_BURGER static bool _flipH = true;
+TINY_BURGER static bool _isFlipH = true;
 TINY_BURGER static bool _isShooting = false;
+TINY_BURGER static bool _isResetLevel = false;
 
 TINY_BURGER static float _interpolationValue = 0.0f;
 TINY_BURGER static float _interpolationMaxValue = 0.8f;
@@ -30,11 +30,14 @@ extern "C"
     TINY_BURGER static void __movement_player(Player_t *const player, const int32_t *const vector);
     TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
     TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor);
-
+    TINY_BURGER static void __update_collision_shape_value(Player_t *const player);
     TINY_BURGER static void __reset_interpolation(Player_t *const player);
     TINY_BURGER static void __linear_interpolation(Player_t *const player);
-
     TINY_BURGER static AnimationPlayer_t *__init_animation_player(void);
+
+    TINY_BURGER static void __falling_movement(Player_t *const player);
+    TINY_BURGER static void __keyboard_movement(Player_t *const player, const int32_t *const vector);
+    TINY_BURGER static void __reset_static_values(void);
 
 #if defined(__cplusplus)
 }
@@ -75,36 +78,59 @@ TINY_BURGER Player_t *create_player(Vector2 position)
         position.y * TINY_BURGER_TILE,
         TINY_BURGER_TILE,
         TINY_BURGER_TILE};
-    player->isInterpolation = false;
+    player->interpolation = false;
+    player->falling = false;
+
+    __reset_static_values();
     TraceLog(LOG_DEBUG, "Player_t pointer created successfully.");
     return player;
 }
 
 TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector)
 {
-    if (player->isInterpolation)
-    {
+
+    if (player->interpolation)
         __linear_interpolation(player);
-    }
     else
-    {
         __movement_player(player, vector);
-    }
+
+    __update_collision_shape_value(player);
+    update_gun(player->gun, _isShooting, _isFlipH, player->position);
     update_animation_player(player->ap);
-    update_gun(player->gun, _isShooting, _flipH, player->position);
 }
 
 TINY_BURGER void update_player_without_movement(Player_t *const player, uint32_t animation)
 {
     set_animation_player(player->ap, animation);
     update_animation_player(player->ap);
-    update_gun(player->gun, _isShooting, _flipH, player->position);
+    update_gun(player->gun, _isShooting, _isFlipH, player->position);
+    __update_collision_shape_value(player);
 }
 
 TINY_BURGER void draw_player(const Player_t *const player)
 {
-    draw_animation_player(player->ap, player->position, _flipH);
+    draw_animation_player(player->ap, player->position, _isFlipH);
     draw_gun(player->gun);
+}
+
+TINY_BURGER Rectangle get_collision_shape_player(const Player_t *const player)
+{
+    return (Rectangle){
+        player->position.x * TINY_BURGER_TILE,
+        player->position.y * TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+        TINY_BURGER_TILE,
+    };
+}
+
+TINY_BURGER void set_falling_player(Player_t *const player, bool value)
+{
+    player->falling = value;
+}
+
+TINY_BURGER bool get_reset_level_player(const Player_t *const player)
+{
+    return _isResetLevel;
 }
 
 TINY_BURGER void destroy_player(Player_t **ptr)
@@ -120,74 +146,15 @@ TINY_BURGER void destroy_player(Player_t **ptr)
     }
 }
 
-TINY_BURGER Rectangle get_collision_shape_player(const Player_t *const player)
-{
-    return (Rectangle){
-        player->position.x * TINY_BURGER_TILE,
-        player->position.y * TINY_BURGER_TILE,
-        TINY_BURGER_TILE,
-        TINY_BURGER_TILE,
-    };
-}
-
 //----------------------------------------------------------------------------------
 // Static Functions Implementation.
 //----------------------------------------------------------------------------------
 TINY_BURGER static void __movement_player(Player_t *const player, const int32_t *const vector)
 {
-    Vector2 position = player->position;
-    int32_t i = player->position.y;
-    int32_t j = player->position.x;
-    PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
-    uint32_t currentTile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
-    _isShooting = false;
-
-    if (IsKeyDown(KEY_UP))
-    {
-        __vertical_movement(&position, vector, -1);
-    }
-    else if (IsKeyDown(KEY_LEFT) && position.x > 0 && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
-    {
-        __horizontal_movement(&position, vector, -1);
-    }
-    else if (IsKeyDown(KEY_DOWN) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
-    {
-        __vertical_movement(&position, vector, 1);
-    }
-    else if (IsKeyDown(KEY_RIGHT) && position.x < (TINY_BURGER_MAP_WIDTH - 1) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
-    {
-        __horizontal_movement(&position, vector, 1);
-    }
-    else if (globalGuiData->bulletAmount > 0 && IsKeyDown(KEY_SPACE))
-    {
-        _isShooting =
-            player->ap->currentAnimation->id != PLAYER_ANIMATION_RUN_STAIR &&
-            player->ap->currentAnimation->id != PLAYER_ANIMATION_IDLE_STAIR_MOV;
-        if (_isShooting)
-        {
-            animation = PLAYER_ANIMATION_SHOOT;
-        }
-    }
-
-    if (!_isShooting && (player->position.x != position.x || player->position.y != position.y))
-    {
-        if (player->position.y != position.y)
-            animation = PLAYER_ANIMATION_RUN_STAIR;
-        else
-            animation = PLAYER_ANIMATION_RUN;
-        player->isInterpolation = true;
-        _interpolationPosition = position;
-    }
-    else if (!_isShooting)
-    {
-        uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
-        if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)
-            animation = PLAYER_ANIMATION_IDLE_STAIR;
-        else if (downTile >= 3 && downTile <= 4 && currentTile >= 1 && currentTile <= 4)
-            animation = PLAYER_ANIMATION_IDLE_STAIR_MOV;
-    }
-
-    set_animation_player(player->ap, animation);
+    if (player->falling)
+        __falling_movement(player);
+    else
+        __keyboard_movement(player, vector);
 }
 
 TINY_BURGER static void __vertical_movement(Vector2 *const position, const int32_t *const vector, int32_t factor)
@@ -219,7 +186,7 @@ TINY_BURGER static void __horizontal_movement(Vector2 *const position, const int
 
     if (nextTile >= 0 && nextTile <= 2)
     {
-        _flipH = factor > 0;
+        _isFlipH = factor > 0;
         position->x += 1 * factor;
     }
 }
@@ -228,7 +195,7 @@ TINY_BURGER static void __reset_interpolation(Player_t *const player)
 {
     _interpolationValue = 0.0f;
     _interpolationPosition = (Vector2){0};
-    player->isInterpolation = false;
+    player->interpolation = false;
 }
 
 TINY_BURGER static void __linear_interpolation(Player_t *const player)
@@ -275,7 +242,7 @@ TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
             (Rectangle){6 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
         };
 
-        Rectangle win[] = {
+        Rectangle celebrate[] = {
             (Rectangle){7 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
             (Rectangle){8 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
             (Rectangle){9 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
@@ -286,15 +253,105 @@ TINY_BURGER static AnimationPlayer_t *__init_animation_player(void)
             (Rectangle){11 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
         };
 
+        Rectangle falling[] = {
+            (Rectangle){12 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+            (Rectangle){13 * TINY_BURGER_TILE, 4 * TINY_BURGER_TILE, TINY_BURGER_TILE, TINY_BURGER_TILE},
+        };
+
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE, idle, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN, run, 2);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR, idleStair, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR_MOV, idleStairUp, 1);
         add_frames_animation_player(ap, PLAYER_ANIMATION_RUN_STAIR, runUp, 2);
-        add_frames_animation_player(ap, PLAYER_ANIMATION_WIN, win, 3);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_CELEBRATE, celebrate, 3);
         add_frames_animation_player(ap, PLAYER_ANIMATION_SHOOT, shoot, 2);
+        add_frames_animation_player(ap, PLAYER_ANIMATION_FALLING, falling, 2);
         set_animation_player(ap, PLAYER_ANIMATION_IDLE_STAIR);
     }
 
     return ap;
+}
+
+TINY_BURGER static void __update_collision_shape_value(Player_t *const player)
+{
+    player->collisionShape.x = player->position.x * TINY_BURGER_TILE;
+    player->collisionShape.y = player->position.y * TINY_BURGER_TILE;
+}
+
+TINY_BURGER static void __keyboard_movement(Player_t *const player, const int32_t *const vector)
+{
+    Vector2 position = player->position;
+    int32_t i = player->position.y;
+    int32_t j = player->position.x;
+    PlayerAnimation_u animation = PLAYER_ANIMATION_IDLE;
+    uint32_t currentTile = (i > -1) ? (vector[j + i * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+    _isShooting = false;
+
+    if (IsKeyDown(KEY_UP))
+    {
+        __vertical_movement(&position, vector, -1);
+    }
+    else if (IsKeyDown(KEY_LEFT) && position.x > 0 && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    {
+        __horizontal_movement(&position, vector, -1);
+    }
+    else if (IsKeyDown(KEY_DOWN) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    {
+        __vertical_movement(&position, vector, 1);
+    }
+    else if (IsKeyDown(KEY_RIGHT) && position.x < (TINY_BURGER_MAP_WIDTH - 1) && position.y < (TINY_BURGER_MAP_HEIGHT - 1))
+    {
+        __horizontal_movement(&position, vector, 1);
+    }
+    else if (globalGuiData->bulletAmount > 0 && IsKeyDown(KEY_SPACE))
+    {
+        _isShooting =
+            player->ap->currentAnimation->id != PLAYER_ANIMATION_RUN_STAIR &&
+            player->ap->currentAnimation->id != PLAYER_ANIMATION_IDLE_STAIR_MOV;
+        if (_isShooting)
+        {
+            animation = PLAYER_ANIMATION_SHOOT;
+        }
+    }
+
+    if (!_isShooting && (player->position.x != position.x || player->position.y != position.y))
+    {
+        if (player->position.y != position.y)
+            animation = PLAYER_ANIMATION_RUN_STAIR;
+        else
+            animation = PLAYER_ANIMATION_RUN;
+        player->interpolation = true;
+        _interpolationPosition = position;
+    }
+    else if (!_isShooting)
+    {
+        uint32_t downTile = (i > -1) ? (vector[j + (i + 1) * TINY_BURGER_MAP_WIDTH] - 1) : 0;
+        if (downTile >= 0 && downTile <= 2 && currentTile >= 1 && currentTile <= 4)
+            animation = PLAYER_ANIMATION_IDLE_STAIR;
+        else if (downTile >= 3 && downTile <= 4 && currentTile >= 1 && currentTile <= 4)
+            animation = PLAYER_ANIMATION_IDLE_STAIR_MOV;
+    }
+
+    set_animation_player(player->ap, animation);
+}
+
+TINY_BURGER static void __falling_movement(Player_t *const player)
+{
+    Vector2 position = player->position;
+    position.y += 1;
+    _interpolationPosition = position;
+    player->interpolation = true;
+    set_animation_player(player->ap, PLAYER_ANIMATION_FALLING);
+
+    if (player->position.y >= TINY_BURGER_MAP_HEIGHT)
+    {
+        _isResetLevel = true;
+    }
+}
+
+TINY_BURGER static void __reset_static_values(void)
+{
+    _isFlipH = true;
+    _isShooting = false;
+    _isResetLevel = false;
 }

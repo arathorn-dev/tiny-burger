@@ -29,7 +29,7 @@ TINY_BURGER static uint32_t _countHamburger = 0;
 TINY_BURGER static Camera2D *_camera = NULL;
 TINY_BURGER static Player_t *_player = NULL;
 TINY_BURGER static Gui_t *_gui = NULL;
-// TINY_BURGER static Enemy_t *_enemy = NULL;
+TINY_BURGER static Enemy_t *_enemy = NULL;
 TINY_BURGER static Hamburger_t *_hamburger[TINY_BURGER_MAX_HAMBURGER_SIZE];
 
 TINY_BURGER static bool _isLoading = true;
@@ -158,7 +158,7 @@ TINY_BURGER void destroy_game(Screen_t **ptr)
         destroy_gui_data(&globalGuiData);
         __unload_hamburger();
         destroy_player(&_player);
-        // destroy_enemy(&_enemy);
+        destroy_enemy(&_enemy);
         unload_path_map(&_vectorPath);
         unload_draw_map(&_vectorDraw);
         MemFree(_camera);
@@ -188,7 +188,7 @@ TINY_BURGER static void __update_transition(Screen_t *const screen)
     }
     else
     {
-        update_player_without_movement(_player, PLAYER_ANIMATION_WIN);
+        update_player_without_movement(_player, PLAYER_ANIMATION_CELEBRATE);
         _fpsTransition++;
     }
 
@@ -257,7 +257,7 @@ TINY_BURGER static void __draw_map(void)
 TINY_BURGER static bool __load_level(int32_t level)
 {
     bool isLoaded = false;
-    if (level < TINY_BURGER_LEVEL_SIZE && _currentLevel != level)
+    if (level < TINY_BURGER_LEVEL_SIZE)
     {
         __reset_loading();
         __reset_transition();
@@ -265,7 +265,7 @@ TINY_BURGER static bool __load_level(int32_t level)
         unload_draw_map(&_vectorDraw);
         unload_path_map(&_vectorPath);
         destroy_player(&_player);
-        // destroy_enemy(&_enemy);
+        destroy_enemy(&_enemy);
         _maxHamburger = 0;
         _countHamburger = 0;
         if (globalGuiData != NULL)
@@ -276,7 +276,7 @@ TINY_BURGER static bool __load_level(int32_t level)
             const char *fileName = __get_level_path(level);
             _vectorDraw = load_draw_map(fileName, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
             _vectorPath = load_path_map(_vectorDraw, TINY_BURGER_MAP_WIDTH, TINY_BURGER_MAP_HEIGHT);
-            // _enemy = create_enemy(TB_ENEMY_TYPE_EGG, __get_position_enemy(level)); // TODO: Remove this.
+            _enemy = create_enemy(TB_ENEMY_TYPE_PICKLE, __get_position_enemy(level)); // TODO: Remove this.
             __init_hamburger();
             __load_hamburger(level);
 
@@ -415,9 +415,9 @@ TINY_BURGER static void __draw(const Screen_t *const screen)
     BeginMode2D(*_camera);
     DrawRectangle(0, 0, TINY_BURGER_WIDTH, TINY_BURGER_HEIGHT, screen->background);
     __draw_map();
-    draw_player(_player);
     __draw_hamburger();
-    // draw_enemy(_enemy);
+    draw_enemy(_enemy);
+    draw_player(_player);
     EndMode2D();
 }
 
@@ -437,6 +437,9 @@ TINY_BURGER static void __update(Screen_t *const screen)
     else if (IsKeyPressed(KEY_F6))
         __load_level(5);
 
+    if (_player != NULL && get_reset_level_player(_player))
+        __load_level(_currentLevel);
+
     if (_countHamburger >= _maxHamburger)
     {
         _isTransition = true;
@@ -446,7 +449,7 @@ TINY_BURGER static void __update(Screen_t *const screen)
         update_gui(_gui);
         __update_hamburger();
         update_player(_player, _vectorPath);
-        // update_enemy(_enemy, _vectorPath, _player);
+        update_enemy(_enemy, _vectorPath, _player);
     }
 }
 
@@ -498,11 +501,11 @@ TINY_BURGER static void __update_hamburger(void)
 }
 TINY_BURGER static void __draw_hamburger(void)
 {
-    for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
-    {
-        if (_hamburger[i] != NULL)
-            draw_hamburger(_hamburger[i]);
-    }
+    // for (uint32_t i = 0; i < TINY_BURGER_MAX_HAMBURGER_SIZE; ++i)
+    // {
+    //     if (_hamburger[i] != NULL)
+    //         draw_hamburger(_hamburger[i]);
+    // }
 }
 
 TINY_BURGER static void __unload_hamburger(void)

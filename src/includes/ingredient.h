@@ -26,8 +26,8 @@ TINY_BURGER typedef struct
     IngredientSegment_t segment[3];
     uint32_t pathIndex;
     uint32_t index;
-    bool isCollision;
-    bool isCompleted;
+    bool collision;
+    bool completed;
     float time;
 } Ingredient_t;
 

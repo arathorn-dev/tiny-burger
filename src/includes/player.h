@@ -11,18 +11,21 @@ TINY_BURGER typedef enum {
     PLAYER_ANIMATION_IDLE_STAIR,
     PLAYER_ANIMATION_IDLE_STAIR_MOV,
     PLAYER_ANIMATION_RUN_STAIR,
-    PLAYER_ANIMATION_WIN,
+    PLAYER_ANIMATION_CELEBRATE,
     PLAYER_ANIMATION_LOSE,
     PLAYER_ANIMATION_SHOOT,
+    PLAYER_ANIMATION_FALLING,
 } PlayerAnimation_u;
 
 TINY_BURGER typedef struct
 {
     Vector2 position;
-    bool isInterpolation;
     Rectangle collisionShape;
     AnimationPlayer_t *ap;
     Gun_t *gun;
+
+    bool interpolation;
+    bool falling;
 } Player_t;
 
 #if defined(__cplusplus)
@@ -34,8 +37,10 @@ extern "C"
     TINY_BURGER void update_player(Player_t *const player, const int32_t *const vector);
     TINY_BURGER void update_player_without_movement(Player_t *const player, uint32_t animation);
     TINY_BURGER void draw_player(const Player_t *const player);
-    TINY_BURGER void destroy_player(Player_t **ptr);
     TINY_BURGER Rectangle get_collision_shape_player(const Player_t *const player);
+    TINY_BURGER void set_falling_player(Player_t *const player, bool value);
+    TINY_BURGER bool get_reset_level_player(const Player_t *const player);
+    TINY_BURGER void destroy_player(Player_t **ptr);
 
 #if defined(__cplusplus)
 }

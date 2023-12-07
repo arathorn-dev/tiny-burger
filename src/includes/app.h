@@ -7,7 +7,7 @@
 TINY_BURGER typedef struct
 {
     Screen_t *screen;
-    bool isRunning;
+    bool running;
     Color background;
 } App_t;
 

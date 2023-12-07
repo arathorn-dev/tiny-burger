@@ -34,8 +34,8 @@ TINY_BURGER Hamburger_t *create_hamburger(Rectangle collisionShape, IngredientPa
 
     __init_ingredient(hamburger);
     hamburger->collisionShape = collisionShape;
-    hamburger->isCollision = false;
-    hamburger->isCompleted = false;
+    hamburger->collision = false;
+    hamburger->completed = false;
     hamburger->path = path;
     hamburger->indexIngredient = 0;
 
@@ -54,12 +54,12 @@ TINY_BURGER void add_hamburger(Hamburger_t *const hamburger, IngredientType_u ty
 
 TINY_BURGER bool is_completed_hamburger(const Hamburger_t *const hamburger)
 {
-    return hamburger->ingredient[0]->isCompleted;
+    return hamburger->ingredient[0]->completed;
 }
 
 TINY_BURGER void update_hamburger(Hamburger_t *const hamburger, Rectangle collisionShape)
 {
-    hamburger->isCollision = CheckCollisionRecs(
+    hamburger->collision = CheckCollisionRecs(
         hamburger->collisionShape,
         collisionShape);
 
@@ -73,7 +73,7 @@ TINY_BURGER void draw_hamburger(const Hamburger_t *const hamburger)
     {
         DrawRectangleRec(
             hamburger->collisionShape,
-            (hamburger->isCollision) ? GREEN : GRAY);
+            (hamburger->collision) ? GREEN : GRAY);
     }
 }
 
@@ -126,7 +126,7 @@ TINY_BURGER static void __update_ingredient(Hamburger_t *const hamburger, Rectan
             }
             else if (!is_completed_ingredient(hamburger->ingredient[0]))
             {
-                check_collision_ingredient(hamburger->ingredient[i], collisionShape, hamburger->isCollision);
+                check_collision_ingredient(hamburger->ingredient[i], collisionShape, hamburger->collision);
             }
         }
     }
